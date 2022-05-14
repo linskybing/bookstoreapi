@@ -17,7 +17,33 @@ class ChatRoomService
     public function readseller($user)
     {
 
-        $query = 'SELECT * FROM ' . $this->obj->table . " WHERE Seller = '" . $user . "' AND DeletedAt IS NULL";
+        $query = "
+        SELECT RoomId ,
+ 		       Seller ,
+ 		       seller.Image AS SellerImage,
+               seller.Active AS SellerActive,
+               `user` AS User,
+               u.Active AS UserActive,
+		       Message ,
+		      chat.CreatedAt     
+        FROM (SELECT c.RoomId,
+		     c.Seller,
+		     c.`User`,
+		     rc.Message ,
+		     rc.CreatedAt
+		     FROM chatroom c
+		     LEFT JOIN recordchat rc
+		     ON c.RoomId = rc.RoomId
+		     ORDER BY rc.CreatedAt DESC
+		     LIMIT 1) chat ,
+	         users seller ,
+	         users u
+        WHERE chat.Seller = seller.Account AND
+		      chat.`User` = u.Account AND
+              chat.Seller = '" . $user . "'
+        ORDER BY CreatedAt DESC , 
+			  User
+        ";
 
         $stmt  = $this->conn->prepare($query);
 
@@ -32,10 +58,11 @@ class ChatRoomService
                 $data_item = array(
                     'RoomId' => $RoomId,
                     'Seller' => $Seller,
+                    'SellerImage' => $SellerImage,
+                    'SellerActive' => $SellerActive,
                     'User' => $User,
-                    'CreatedAt' => $CreatedAt,
-                    'UpdatedAt' => $UpdatedAt,
-                    'DeletedAt' => $DeletedAt
+                    'SellerActive' => $SellerActive,
+                    'Message' => $Message,
                 );
                 array_push($response_arr['data'], $data_item);
             }
@@ -55,20 +82,27 @@ class ChatRoomService
  		       Seller ,
  		       seller.Image AS SellerImage,
                seller.Active AS SellerActive,
-               `user` ,
+               `user` AS User,
                u.Active AS UserActive,
-		       Message      
+		       Message ,
+		      chat.CreatedAt     
         FROM (SELECT c.RoomId,
 		     c.Seller,
 		     c.`User`,
-		     rc.Message
+		     rc.Message ,
+		     rc.CreatedAt
 		     FROM chatroom c
 		     LEFT JOIN recordchat rc
-		     ON c.RoomId = rc.RoomId) chat ,
+		     ON c.RoomId = rc.RoomId
+		     ORDER BY rc.CreatedAt DESC
+		     LIMIT 1) chat ,
 	         users seller ,
 	         users u
         WHERE chat.Seller = seller.Account AND
-              chat.`User` = u.Account
+		      chat.`User` = u.Account AND
+              chat.User = '" . $user . "'
+        ORDER BY CreatedAt DESC , 
+			  Seller
         ";
 
         $stmt  = $this->conn->prepare($query);
