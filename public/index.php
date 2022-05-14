@@ -141,6 +141,12 @@ $router->post('/user/forgetv', function ($request, $controller) {
     return json_encode($result);
 }, $usercontroller);
 
+//登出
+$router->get('/user/logout', function ($request, $controller) {
+
+    $result = $controller->Logout($request);
+    return json_encode($result);
+}, $usercontroller);
 
 //---------------------------------------------------------------------------------------------------------------------
 //Product

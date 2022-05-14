@@ -74,6 +74,8 @@ class UserController
                     $token[$key] = $value;
                 }
 
+                $result = $this->userservice->update($data['Account'], array('Active' => true));
+
                 return $token;
             } else {
                 $result =  ['error' => '帳號或密碼錯誤'];
@@ -278,5 +280,15 @@ class UserController
         } else {
             return ['error' => '重設密碼已經失效，請至忘記密碼重新寄送重設郵件'];
         }
+    }
+
+    public function Logout($request)
+    {
+        $auth = Authentication::isAuth();
+        if (isset($auth['error'])) return $auth;
+
+        
+        $result = $this->userservice->update($auth, array('Active' => false));
+        return $result;
     }
 }
