@@ -15,12 +15,12 @@ class ChatRoomController
         $this->roomservice = new ChatRoomService($db);
     }
 
-    public function GetCustomer($request)
+    public function GetCustomer($request,$search)
     {
         $auth = Authentication::isAuth();
         if (isset($auth['error'])) return $auth;
 
-        $data = $this->roomservice->readcustomer($auth);
+        $data = $this->roomservice->readcustomer($auth,$search);
         return $data;
     }
 

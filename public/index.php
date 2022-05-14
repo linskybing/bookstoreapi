@@ -441,9 +441,9 @@ $router->delete('/announcement/{id}', function ($request, $controller, $id) {
 //---------------------------------------------------------------------------------------------------------------------
 //Chatroom
 
-$router->get('/chatroomc', function ($request, $controller) {
+$router->get('/chatroomc/{search}', function ($request, $controller, $search) {
 
-    $result = $controller->GetCustomer($request);
+    $result = $controller->GetCustomer($request, $search);
     return json_encode($result);
 }, $chatroomcontroller);
 
