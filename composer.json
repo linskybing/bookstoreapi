@@ -1,0 +1,25 @@
+{
+    "name": "restful/api",
+    "description": "forbookstore",
+    "type": "project",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Restful\\Api\\": "src/"
+        },
+        "classmap": [
+            "model",
+            "service",
+            "config",
+            "controller",
+            "auth"
+        ]
+    },
+    "authors": [
+        {
+            "name": "Lin Bing Hong",
+            "email": "linskybing@gmail.com"
+        }
+    ],
+    "require": {}
+}
