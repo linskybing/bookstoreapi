@@ -101,10 +101,10 @@ class ChatRoomService
             WHERE chat.Seller = seller.Account AND
                   chat.`User` = u.Account AND
                   chat.`User` = '" . $user . "' AND
-                  Seller = '" . $search . "'
+                  seller.Name = '" . $search . "'
             ORDER BY CreatedAt DESC , 
                   Seller
-            ";
+            ";            
         } else {
             $query = "
             SELECT RoomId ,
