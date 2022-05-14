@@ -50,7 +50,26 @@ class ChatRoomService
     public function readcustomer($user)
     {
 
-        $query = 'SELECT * FROM ' . $this->obj->table . " WHERE User = '" . $user . "' AND DeletedAt IS NULL";
+        $query = "
+        SELECT RoomId ,
+ 		       Seller ,
+ 		       seller.Image AS SellerImage,
+               seller.Active AS SellerActive,
+               `user` ,
+               u.Active AS UserActive,
+		       Message      
+        FROM (SELECT c.RoomId,
+		     c.Seller,
+		     c.`User`,
+		     rc.Message
+		     FROM chatroom c
+		     LEFT JOIN recordchat rc
+		     ON c.RoomId = rc.RoomId) chat ,
+	         users seller ,
+	         users u
+        WHERE chat.Seller = seller.Account AND
+              chat.`User` = u.Account
+        ";
 
         $stmt  = $this->conn->prepare($query);
 
@@ -65,10 +84,11 @@ class ChatRoomService
                 $data_item = array(
                     'RoomId' => $RoomId,
                     'Seller' => $Seller,
+                    'SellerImage' => $SellerImage,
+                    'SellerActive' => $SellerActive,
                     'User' => $User,
-                    'CreatedAt' => $CreatedAt,
-                    'UpdatedAt' => $UpdatedAt,
-                    'DeletedAt' => $DeletedAt
+                    'SellerActive' => $SellerActive,
+                    'Message' => $Message
                 );
                 array_push($response_arr['data'], $data_item);
             }

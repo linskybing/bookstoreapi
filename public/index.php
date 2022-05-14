@@ -141,6 +141,13 @@ $router->post('/user/forgetv', function ($request, $controller) {
     return json_encode($result);
 }, $usercontroller);
 
+//取得使用者大頭貼
+$router->get('/user/image', function ($request, $controller) {
+
+    $result = $controller->GetUserImage($request);
+    return json_encode($result);
+}, $usercontroller);
+
 //登出
 $router->get('/user/logout', function ($request, $controller) {
 

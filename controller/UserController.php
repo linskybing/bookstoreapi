@@ -287,8 +287,18 @@ class UserController
         $auth = Authentication::isAuth();
         if (isset($auth['error'])) return $auth;
 
-        
+
         $result = $this->userservice->update($auth, array('Active' => false));
         return $result;
+    }
+
+    public function GetUserImage($request)
+    {
+        $auth = Authentication::isAuth();
+        if (isset($auth['error'])) return $auth;
+
+        $data = $this->userservice->read_single($auth);
+
+        return array('Image' => $data['Image']);
     }
 }
