@@ -14,10 +14,14 @@ class ChatRecordService
     }
 
     //讀取
-    public function read($roomid)
+    public function read($roomid, $nowpage, $itemnum)
     {
 
-        $query = 'SELECT * FROM ' . $this->obj->table . ' WHERE RoomId = ' . $roomid;
+        $query = 'SELECT c.* , u.Image
+                  FROM ' . $this->obj->table . ' c , users u
+                  WHERE RoomId = ' . $roomid . ' AND u.Account =  c.Creator
+                  ORDER BY CreatedAt DESC 
+                  LIMIT ' . (($nowpage - 1) * $itemnum) . ',' . $nowpage * $itemnum . ';';
 
         $stmt  = $this->conn->prepare($query);
 
@@ -34,6 +38,7 @@ class ChatRecordService
                     'RoomId' => $RoomId,
                     'Creator' => $Creator,
                     'Message' => $Message,
+                    'Image' => $Image,
                     'CreatedAt' => $CreatedAt,
                     'UpdatedAt' => $UpdatedAt,
                     'DeletedAt' => $DeletedAt
@@ -46,6 +51,64 @@ class ChatRecordService
 
         return $response_arr;
     }
+
+    //取得留言數
+    public function GetChatCount($roomid)
+    {
+        $query = 'SELECT c.* , u.Image
+        FROM ' . $this->obj->table . ' c , users u
+        WHERE RoomId = ' . $roomid . ' AND u.Account =  c.Creator
+        ORDER BY CreatedAt DESC ';
+
+        $stmt  = $this->conn->prepare($query);
+
+        $result = $stmt->execute();
+
+        $num = $stmt->rowCount();
+
+        return $num;
+    }
+
+    //refresh chat
+
+    public function refresh($roomid, $time)
+    {
+        $query = "SELECT c.* , u.Image
+                  FROM " . $this->obj->table . " c , users u
+                  WHERE RoomId = " . $roomid . " AND 
+                        u.Account =  c.Creator AND 
+                        c.CreatedAt > '" . $time . "'
+                  ORDER BY CreatedAt DESC";
+
+        $stmt  = $this->conn->prepare($query);
+
+        $result = $stmt->execute();
+
+        $num = $stmt->rowCount();
+        if ($num > 0) {
+            $response_arr = array();
+            $response_arr['data'] = array();
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                extract($row);
+                $data_item = array(
+                    'ChatId' => $ChatId,
+                    'RoomId' => $RoomId,
+                    'Creator' => $Creator,
+                    'Message' => $Message,
+                    'Image' => $Image,
+                    'CreatedAt' => $CreatedAt,
+                    'UpdatedAt' => $UpdatedAt,
+                    'DeletedAt' => $DeletedAt
+                );
+                array_push($response_arr['data'], $data_item);
+            }
+        } else {
+            $response_arr['info'] = '尚未更新';
+        }
+
+        return $response_arr;
+    }
+
 
     //讀取單筆資料
     public function read_single($ChatId)
@@ -163,6 +226,4 @@ class ChatRecordService
             return $response_arr['info'] = '資料刪除失敗';
         }
     }
-
-   
 }

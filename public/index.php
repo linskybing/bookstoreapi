@@ -447,9 +447,9 @@ $router->get('/chatroomc/{search}', function ($request, $controller, $search) {
     return json_encode($result);
 }, $chatroomcontroller);
 
-$router->get('/chatrooms', function ($request, $controller) {
+$router->get('/chatrooms/{search}', function ($request, $controller, $search) {
 
-    $result = $controller->GetSeller($request);
+    $result = $controller->GetSeller($request, $search);
     return json_encode($result);
 }, $chatroomcontroller);
 
@@ -474,15 +474,27 @@ $router->delete('/chatroom/{id}', function ($request, $controller, $id) {
 //---------------------------------------------------------------------------------------------------------------------
 //Chat
 
-$router->get('/chatroomr/{id}', function ($request, $controller, $id) {
+$router->get('/chatroomr/{id}/{nowpage}/{itemnum}', function ($request, $controller, $id, $nowpage, $itemnum) {
 
-    $result = $controller->Get($request, $id);
+    $result = $controller->Get($request, $id, $nowpage, $itemnum);
     return json_encode($result);
 }, $chatcontroller);
 
 $router->get('/chatroomrr/{id}', function ($request, $controller, $id) {
 
     $result = $controller->Get_Single($request, $id);
+    return json_encode($result);
+}, $chatcontroller);
+
+$router->get('/chatroomrrefresh/{id}/{time}', function ($request, $controller, $id, $time) {
+
+    $result = $controller->Refresh($request, $id, $time);
+    return json_encode($result);
+}, $chatcontroller);
+
+$router->get('/chatroomrcount/{roomid}', function ($request, $controller, $id) {
+
+    $result = $controller->GetChatCount($request, $id);
     return json_encode($result);
 }, $chatcontroller);
 

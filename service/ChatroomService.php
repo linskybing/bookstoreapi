@@ -14,36 +14,66 @@ class ChatRoomService
     }
 
     //讀取
-    public function readseller($user)
+    public function readseller($user, $search)
     {
-
-        $query = "
-        SELECT RoomId ,
-               seller.Name AS Seller,
- 		       seller.Image AS SellerImage,
-               seller.Active AS SellerActive,
-               u.Name AS User,
-               u.Active AS UserActive,
-		       Message ,
-		      chat.CreatedAt     
-        FROM (SELECT * FROM (SELECT c.RoomId,
-             c.Seller,
-             c.`User`,
-             rc.Message ,
-             rc.CreatedAt
-             FROM chatroom c
-             LEFT JOIN recordchat rc
-             ON c.RoomId = rc.RoomId 
-             ORDER BY rc.CreatedAt DESC)temp
-             GROUP BY RoomId) chat ,
-	         users seller ,
-	         users u
-        WHERE chat.Seller = seller.Account AND
-		      chat.`User` = u.Account AND
-              chat.`Seller` = '" . $user . "'
-        ORDER BY CreatedAt DESC , 
-			  User
-        ";
+        if ($search != "null") {
+            $query = "
+            SELECT RoomId ,
+                seller.Name AS Seller,
+                seller.Image AS SellerImage,
+                seller.Active AS SellerActive,
+                u.Name AS User,
+                u.Active AS UserActive,
+                Message ,
+                chat.CreatedAt     
+            FROM (SELECT * FROM (SELECT c.RoomId,
+                c.Seller,
+                c.`User`,
+                rc.Message ,
+                rc.CreatedAt
+                FROM chatroom c
+                LEFT JOIN recordchat rc
+                ON c.RoomId = rc.RoomId 
+                ORDER BY rc.CreatedAt DESC)temp
+                GROUP BY RoomId) chat ,
+                users seller ,
+                users u
+            WHERE chat.Seller = seller.Account AND
+                chat.`User` = u.Account AND
+                chat.`Seller` = '" . $user . "' AND
+                u.Name = '" . $search . "'
+            ORDER BY CreatedAt DESC , 
+                User
+            ";
+        } else {
+            $query = "
+            SELECT RoomId ,
+                   seller.Name AS Seller,
+                    seller.Image AS SellerImage,
+                   seller.Active AS SellerActive,
+                   u.Name AS User,
+                   u.Active AS UserActive,
+                   Message ,
+                  chat.CreatedAt     
+            FROM (SELECT * FROM (SELECT c.RoomId,
+                 c.Seller,
+                 c.`User`,
+                 rc.Message ,
+                 rc.CreatedAt
+                 FROM chatroom c
+                 LEFT JOIN recordchat rc
+                 ON c.RoomId = rc.RoomId 
+                 ORDER BY rc.CreatedAt DESC)temp
+                 GROUP BY RoomId) chat ,
+                 users seller ,
+                 users u
+            WHERE chat.Seller = seller.Account AND
+                  chat.`User` = u.Account AND
+                  chat.`Seller` = '" . $user . "'                  
+            ORDER BY CreatedAt DESC , 
+                  User
+            ";
+        }
 
         $stmt  = $this->conn->prepare($query);
 
@@ -104,7 +134,7 @@ class ChatRoomService
                   seller.Name = '" . $search . "'
             ORDER BY CreatedAt DESC , 
                   Seller
-            ";            
+            ";
         } else {
             $query = "
             SELECT RoomId ,

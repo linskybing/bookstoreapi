@@ -24,12 +24,12 @@ class ChatRoomController
         return $data;
     }
 
-    public function GetSeller($request)
+    public function GetSeller($request,$search)
     {
         $auth = Authentication::isAuth();
         if (isset($auth['error'])) return $auth;
 
-        $data = $this->roomservice->readseller($auth);
+        $data = $this->roomservice->readseller($auth,$search);
         return $data;
     }
 

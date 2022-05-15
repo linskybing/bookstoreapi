@@ -18,14 +18,40 @@ class ChatRecordController
         $this->chatroomservice = new ChatRoomService($db);
     }
 
-    public function Get($request, $roomid)
+    public function Get($request, $roomid, $nowpage, $itemnum)
     {
         $auth = Authentication::isAuth();
         if (isset($auth['error'])) return $auth;
+        if (!$this->chatroomservice->ischatroomuser($roomid, $auth)) return ['error' => '權限不足'];
 
-        $data = $this->chatservice->read($roomid);
+        $data = $this->chatservice->read($roomid, $nowpage, $itemnum);
 
         return $data;
+    }
+
+    public function Refresh($request, $roomid, $time)
+    {
+        $auth = Authentication::isAuth();
+        if (isset($auth['error'])) return $auth;
+        if (!$this->chatroomservice->ischatroomuser($roomid, $auth)) return ['error' => '權限不足'];
+
+        $time = str_replace('_', ' ', $time);
+
+        $data = $this->chatservice->refresh($roomid, $time);
+
+        return $data;
+    }
+
+    //取得留言數
+    public function GetChatCount($request, $roomid)
+    {
+        $auth = Authentication::isAuth();
+        if (isset($auth['error'])) return $auth;
+        if (!$this->chatroomservice->ischatroomuser($roomid, $auth)) return ['error' => '權限不足'];
+
+        $count  = $this->chatservice->GetChatCount($roomid);
+
+        return $count;
     }
 
     public function Get_Single($request, $id)
@@ -35,7 +61,7 @@ class ChatRecordController
 
 
         $data = $this->chatservice->read_single($id);
-        if (!$this->chatroomservice->ischatroomuser($data['RoomId'], $auth)) return ['error' => '權限不足'];        
+        if (!$this->chatroomservice->ischatroomuser($data['RoomId'], $auth)) return ['error' => '權限不足'];
         return $data;
     }
 
