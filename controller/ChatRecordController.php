@@ -61,7 +61,13 @@ class ChatRecordController
 
 
         $data = $this->chatservice->read_single($id);
-        if (!$this->chatroomservice->ischatroomuser($data['RoomId'], $auth)) return ['error' => '權限不足'];
+        if (isset($data['RoomId'])) {
+            if (!$this->chatroomservice->ischatroomuser($data['RoomId'], $auth)) return ['error' => '權限不足'];
+        }
+        else{
+            return ['error' => '權限不足'];
+        }
+
         return $data;
     }
 

@@ -28,8 +28,12 @@ class ChatRecordService
         $result = $stmt->execute();
 
         $num = $stmt->rowCount();
+
+        $response_arr = array();        
+        $detail = $this->read_single($roomid);
+        if (isset($detail['RoomId'])) array_push($response_arr, $detail);
+
         if ($num > 0) {
-            $response_arr = array();
             $response_arr['data'] = array();
             while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                 extract($row);
@@ -111,9 +115,17 @@ class ChatRecordService
 
 
     //讀取單筆資料
-    public function read_single($ChatId)
+    public function read_single($Id)
     {
-        $query = "SELECT * FROM " . $this->obj->table . " WHERE ChatId = " . $ChatId . " AND DeletedAt IS NULL;";
+        $query = "SELECT c.RoomId ,
+                         a.Name AS Seller , 
+                         a.Image AS SellerImage,
+                         a.Active AS SellerActive,
+                         b.Name AS User,                        
+                         b.Image AS UserImage,
+                         b.Active AS UserActive
+                  FROM chatroom c ,users a , users b 
+                  WHERE RoomId = " . $Id . " AND c.Seller = a.Account AND c.User = b.Account";
 
         $stmt = $this->conn->prepare($query);
 
@@ -125,19 +137,19 @@ class ChatRecordService
             extract($row);
 
             $data = array(
-                'ChatId' => $ChatId,
                 'RoomId' => $RoomId,
-                'Creator' => $Creator,
-                'Message' => $Message,
-                'CreatedAt' => $CreatedAt,
-                'UpdatedAt' => $UpdatedAt,
-                'DeletedAt' => $DeletedAt
+                'Seller' => $Seller,
+                'SellerActive' => $SellerActive,
+                'SellerImage' => $SellerImage,
+                'User' => $User,
+                'UserImage' => $UserImage,
+                'UserActive' => $UserActive,
             );
 
             $response_arr = $data;
             return $response_arr;
         } else {
-            $response_arr['info'] = '留言不存在';
+            $response_arr['info'] = '資訊不存在';
             return $response_arr;
         }
     }
@@ -170,8 +182,7 @@ class ChatRecordService
 
         if ($result) {
 
-            $id = $this->conn->lastInsertId();
-            $response_arr = $this->read_single($id);
+            $response_arr['info'] = '新增成功';
         } else {
 
             $response_arr['error'] = '資料新增失敗';

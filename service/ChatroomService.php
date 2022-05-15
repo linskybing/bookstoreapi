@@ -19,23 +19,26 @@ class ChatRoomService
         if ($search != "null") {
             $query = "
             SELECT RoomId ,
-                seller.Name AS Seller,
-                seller.Image AS SellerImage,
+                seller.Name AS Seller,                
                 seller.Active AS SellerActive,
                 u.Name AS User,
+                u.Image AS UserImage,
                 u.Active AS UserActive,
                 Message ,
                 chat.CreatedAt     
-            FROM (SELECT * FROM (SELECT c.RoomId,
+            FROM (SELECT c.RoomId,
                 c.Seller,
                 c.`User`,
                 rc.Message ,
                 rc.CreatedAt
                 FROM chatroom c
-                LEFT JOIN recordchat rc
-                ON c.RoomId = rc.RoomId 
-                ORDER BY rc.CreatedAt DESC)temp
-                GROUP BY RoomId) chat ,
+                LEFT JOIN (SELECT * 
+                        FROM recordchat r
+                        WHERE r.CreatedAt >=
+                        ALL(SELECT CreatedAt
+                            FROM recordchat rc2
+                            WHERE r.RoomId = rc2.RoomId))rc
+                ON c.RoomId = rc.RoomId) chat ,
                 users seller ,
                 users u
             WHERE chat.Seller = seller.Account AND
@@ -48,25 +51,28 @@ class ChatRoomService
         } else {
             $query = "
             SELECT RoomId ,
-                   seller.Name AS Seller,
-                    seller.Image AS SellerImage,
+                   seller.Name AS Seller,                   
                    seller.Active AS SellerActive,
                    u.Name AS User,
+                   u.Image AS UserImage,
                    u.Active AS UserActive,
                    Message ,
                   chat.CreatedAt     
-            FROM (SELECT * FROM (SELECT c.RoomId,
-                 c.Seller,
-                 c.`User`,
-                 rc.Message ,
-                 rc.CreatedAt
-                 FROM chatroom c
-                 LEFT JOIN recordchat rc
-                 ON c.RoomId = rc.RoomId 
-                 ORDER BY rc.CreatedAt DESC)temp
-                 GROUP BY RoomId) chat ,
-                 users seller ,
-                 users u
+            FROM (SELECT c.RoomId,
+                c.Seller,
+                c.`User`,
+                rc.Message ,
+                rc.CreatedAt
+                FROM chatroom c
+                LEFT JOIN (SELECT * 
+                        FROM recordchat r
+                        WHERE r.CreatedAt >=
+                        ALL(SELECT CreatedAt
+                            FROM recordchat rc2
+                            WHERE r.RoomId = rc2.RoomId))rc
+                ON c.RoomId = rc.RoomId) chat ,
+                users seller ,
+                users u
             WHERE chat.Seller = seller.Account AND
                   chat.`User` = u.Account AND
                   chat.`Seller` = '" . $user . "'                  
@@ -88,10 +94,10 @@ class ChatRoomService
                 $data_item = array(
                     'RoomId' => $RoomId,
                     'Seller' => $Seller,
-                    'SellerImage' => $SellerImage,
                     'SellerActive' => $SellerActive,
                     'User' => $User,
-                    'SellerActive' => $SellerActive,
+                    'UserImage' => $UserImage,
+                    'UserActive' => $SellerActive,
                     'Message' => $Message,
                 );
                 array_push($response_arr['data'], $data_item);
@@ -116,18 +122,21 @@ class ChatRoomService
                    u.Active AS UserActive,
                    Message ,
                   chat.CreatedAt     
-            FROM (SELECT * FROM (SELECT c.RoomId,
-                 c.Seller,
-                 c.`User`,
-                 rc.Message ,
-                 rc.CreatedAt
-                 FROM chatroom c
-                 LEFT JOIN recordchat rc
-                 ON c.RoomId = rc.RoomId 
-                 ORDER BY rc.CreatedAt DESC)temp
-                 GROUP BY RoomId) chat ,
-                 users seller ,
-                 users u
+            FROM (SELECT c.RoomId,
+                    c.Seller,
+                    c.`User`,
+                    rc.Message ,
+                    rc.CreatedAt
+                    FROM chatroom c
+                    LEFT JOIN (SELECT * 
+                            FROM recordchat r
+                            WHERE r.CreatedAt >=
+                            ALL(SELECT CreatedAt
+                                FROM recordchat rc2
+                                WHERE r.RoomId = rc2.RoomId))rc
+                    ON c.RoomId = rc.RoomId) chat ,
+                    users seller ,
+                    users u
             WHERE chat.Seller = seller.Account AND
                   chat.`User` = u.Account AND
                   chat.`User` = '" . $user . "' AND
@@ -145,18 +154,21 @@ class ChatRoomService
                 u.Active AS UserActive,
                 Message ,
                 chat.CreatedAt     
-            FROM (SELECT * FROM (SELECT c.RoomId,
+            FROM (SELECT c.RoomId,
                 c.Seller,
                 c.`User`,
                 rc.Message ,
                 rc.CreatedAt
                 FROM chatroom c
-                LEFT JOIN recordchat rc
-                ON c.RoomId = rc.RoomId 
-                ORDER BY rc.CreatedAt DESC)temp
-                GROUP BY RoomId) chat ,
+                LEFT JOIN (SELECT * 
+                        FROM recordchat r
+                        WHERE r.CreatedAt >=
+                        ALL(SELECT CreatedAt
+                            FROM recordchat rc2
+                            WHERE r.RoomId = rc2.RoomId))rc
+                ON c.RoomId = rc.RoomId) chat ,
                 users seller ,
-                users u
+                users u             
             WHERE chat.Seller = seller.Account AND
                 chat.`User` = u.Account AND
                 chat.`User` = '" . $user . "'
@@ -220,7 +232,7 @@ class ChatRoomService
             $response_arr = $data;
             return $response_arr;
         } else {
-            $response_arr['info'] = '商品不存在';
+            $response_arr['info'] = '聊天室不存在';
             return $response_arr;
         }
     }

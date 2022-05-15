@@ -37,7 +37,7 @@ class ChatRoomController
     {
         $auth = Authentication::isAuth();
         if (isset($auth['error'])) return $auth;
-        if (!$this->chatroomservice->ischatroomuser($id, $auth)) return ['error' => '權限不足'];
+        if (!$this->roomservice->ischatroomuser($id, $auth)) return ['error' => '權限不足'];
         $data = $this->roomservice->read_single($id);
 
         return $data;
