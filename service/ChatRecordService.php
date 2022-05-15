@@ -29,7 +29,7 @@ class ChatRecordService
 
         $num = $stmt->rowCount();
 
-        $response_arr = array();        
+        $response_arr = array();
         $detail = $this->read_single($roomid);
         if (isset($detail['RoomId'])) array_push($response_arr, $detail);
 
@@ -113,6 +113,28 @@ class ChatRecordService
         return $response_arr;
     }
 
+    //讀取最後留言時間
+    public function read_last_time($roomid)
+    {
+        $query = "SELECT MAX(CreatedAt) AS CreatedAt
+                  FROM recordchat c
+                  WHERE RoomId = " . $roomid;
+
+        $stmt = $this->conn->prepare($query);
+
+        $result = $stmt->execute();
+
+
+        if ($stmt->rowCount() > 0) {
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            extract($row);
+
+            return  $CreatedAt;
+        } else {
+
+            return null;
+        }
+    }
 
     //讀取單筆資料
     public function read_single($Id)
@@ -144,6 +166,7 @@ class ChatRecordService
                 'User' => $User,
                 'UserImage' => $UserImage,
                 'UserActive' => $UserActive,
+                'CreatedAt' => $this->read_last_time($RoomId)
             );
 
             $response_arr = $data;
