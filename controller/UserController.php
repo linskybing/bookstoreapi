@@ -142,7 +142,9 @@ class UserController
             if (!is_null($_FILES)) {
                 $file = File::store($_FILES, 'Members', $data['Name']);
 
-                $result['info'] = $this->userservice->update($auth, array('Image' => $file[0]));
+                $this->userservice->update($auth, array('Image' => $file[0]));
+                $data = $this->userservice->read_single($auth);
+                $result['data'] = $data['Image'];
             } else {
                 return ['error' => '檔案不可為空'];
             }
