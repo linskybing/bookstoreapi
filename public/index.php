@@ -157,7 +157,7 @@ $router->get('/user/logout', function ($request, $controller) {
 
 //---------------------------------------------------------------------------------------------------------------------
 //Product
-$router->get('/product/{state}/{search}/{nowpage}/{itemnum}', function ($request, $controller, $state, $search, $nowpage, $itemnum) {
+$router->get('/product/{category}/{state}/{search}/{nowpage}/{itemnum}', function ($request, $controller, $state, $search, $nowpage, $itemnum) {
 
     $result = $controller->Get($request, $state, $search, $nowpage, $itemnum);
     return json_encode($result);

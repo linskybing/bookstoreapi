@@ -21,14 +21,12 @@ class ProductController
         $this->producttag = new TagListService($db);
     }
 
-    public function Get($request, $state, $search = null, $nowpage = 1, $itemnum = 10)
+    public function Get($request, $category = null, $state, $search = null, $nowpage = 1, $itemnum = 10)
     {
-        try {
-            $data = $this->productservice->read($state, $search, $nowpage, $itemnum);
+       
+            $data = $this->productservice->read($category, $state, $search, $nowpage, $itemnum);
             return $data;
-        } catch (Exception $e) {
-            return ['error' => '發生錯誤，請查看參數是否正確'];
-        }
+       
     }
 
     public function Get_Seller($request, $state, $search, $nowpage = 1, $itemnum = 10)
@@ -38,7 +36,7 @@ class ProductController
 
             $auth = Authentication::isAuth();
             if (isset($auth['error'])) return $auth;
-            $data = $this->productservice->read_seller($state, $search, $nowpage, $itemnum, $auth);            
+            $data = $this->productservice->read_seller($state, $search, $nowpage, $itemnum, $auth);
             return $data;
         } catch (Exception $e) {
 

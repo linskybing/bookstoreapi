@@ -18,7 +18,14 @@ class TagListService
     public function read($product)
     {
 
-        $query = 'SELECT * FROM ' . $this->obj->table . ' WHERE ProductId = ' . $product . ' AND DeletedAt IS NULL';
+        $query = "SELECT t.Id,
+                         t.CategoryId,
+                         t.ProductId,
+                         c.Tag
+                  FROM taglist t,
+                        category c
+                  WHERE t.CategoryId = c.CategoryId AND
+                        t.ProductId = " . $product;
 
         $stmt  = $this->conn->prepare($query);
 
@@ -33,9 +40,7 @@ class TagListService
                 $data_item = array(
                     'Id' => $Id,
                     'CategoryId' => $CategoryId,
-                    'ProductId' => $ProductId,
-                    'CreatedAt' => $CreatedAt,
-                    'UpdatedAt' => $UpdatedAt,
+                    'Tag' => $Tag,                    
                 );
                 array_push($response_arr['data'], $data_item);
             }
@@ -63,9 +68,7 @@ class TagListService
             $data = array(
                 'Id' => $Id,
                 'CategoryId' => $CategoryId,
-                'ProductId' => $ProductId,
-                'CreatedAt' => $CreatedAt,
-                'UpdatedAt' => $UpdatedAt,
+                'Tag' => $Tag,
             );
 
             $response_arr = $data;

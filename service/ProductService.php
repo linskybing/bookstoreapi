@@ -18,7 +18,7 @@ class ProductService
     }
 
     //讀取
-    public function read($state, $search, $nowpage, $itemnum)
+    public function read($category, $state, $search, $nowpage, $itemnum)
     {
 
         if ($search != null) {
@@ -68,6 +68,40 @@ class ProductService
                 LIMIT " . (($nowpage - 1) * $itemnum) . "," . $nowpage * $itemnum . ';';
         }
 
+        if ($category != 'null') {
+            $query = "SELECT p.ProductId,
+                            Name,
+                            Description,
+                            Price,
+                            Inventory,
+                            Image,
+                            State,
+                            Seller,
+                            Watch,
+                            p.CreatedAt,
+                            Rent,
+                            MaxRent,
+                            RentPrice,
+                            T.*
+                    FROM product p
+                    LEFT JOIN productimage img
+                    ON p.ProductId = img.ProductId
+                    LEFT JOIN (SELECT t.Id,
+                                      t.CategoryId,
+                                      t.ProductId,
+                                      c.Tag
+                                      FROM taglist t,
+                                           category c
+                                      WHERE t.CategoryId = c.CategoryId)T
+                    ON p.ProductId = T.ProductId
+                    WHERE p.DeletedAt IS NULL AND
+                          State = '" . $state . "' AND
+                          Tag IN ('" . $category . "')
+                    GROUP BY p.ProductId
+                    ORDER BY CreatedAt	
+                    LIMIT " . (($nowpage - 1) * $itemnum) . "," . $nowpage * $itemnum . ';';
+        }
+
         $stmt  = $this->conn->prepare($query);
 
         $result = $stmt->execute();
@@ -107,7 +141,8 @@ class ProductService
 
     public function read_seller($state, $search, $nowpage, $itemnum, $auth)
     {
-        if ($search != null) {
+
+        if ($search != 'null') {
             $query = "SELECT p.ProductId,
                             Name,
                             Description,
@@ -125,7 +160,7 @@ class ProductService
                     LEFT JOIN productimage img
                     ON p.ProductId = img.ProductId
                     WHERE p.DeletedAt IS NULL AND
-                        State = '" . $state . "' OR
+                        State = '" . $state . "' AND
                         Name LIKE '%" . $search . "%' AND
                         Seller = '" . $auth . "'
                     GROUP BY ProductId
@@ -150,12 +185,11 @@ class ProductService
                 ON p.ProductId = img.ProductId
                 WHERE p.DeletedAt IS NULL AND
                       State = '" . $state . "' AND
-                    Seller = '" . $auth . "'
+                      Seller = '" . $auth . "'
                 GROUP BY ProductId
                 ORDER BY CreatedAt	
                 LIMIT " . (($nowpage - 1) * $itemnum) . "," . $nowpage * $itemnum . ';';
         }
-
 
         $stmt  = $this->conn->prepare($query);
 
@@ -214,7 +248,6 @@ class ProductService
                 'Description' => $Description,
                 'Price' => $Price,
                 'Inventory' => $Inventory,
-                'Image' => $Image,
                 'State' => $State,
                 'Rent' => $Rent,
                 'MaxRent' => $MaxRent,
