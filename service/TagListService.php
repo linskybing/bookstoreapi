@@ -40,7 +40,7 @@ class TagListService
                 array_push($response_arr['data'], $data_item);
             }
         } else {
-            $response_arr['info'] = '尚未有商品標籤';
+            $response_arr['data'] = null;
         }
 
         return $response_arr;
@@ -71,7 +71,7 @@ class TagListService
             $response_arr = $data;
             return $response_arr;
         } else {
-            $response_arr['info'] = '標籤不存在';
+            $response_arr['data'] = null;
             return $response_arr;
         }
     }
@@ -90,7 +90,7 @@ class TagListService
                   VALUES ( ? , ? , ? , ? )";
 
         $stmt = $this->conn->prepare($query);
-        
+
         $time = date('Y-m-d H:i:s');
 
         $result = $stmt->execute(array(

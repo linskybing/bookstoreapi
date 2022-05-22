@@ -213,7 +213,7 @@ class UserController
     {
         $result = $this->userservice->checkauthcode($user, $auth);
 
-        header('Location: http://localhost/view/validate_result.html');
+        header('Location: http://localhost/bookstore/view/validate_result.html');
     }
 
     //忘記密碼

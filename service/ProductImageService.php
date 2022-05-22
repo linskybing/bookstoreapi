@@ -38,7 +38,7 @@ class ProductImageService
                 array_push($response_arr['data'], $data_item);
             }
         } else {
-            $response_arr['info'] = '尚未有商品圖片';
+            $response_arr['data'] = null;
         }
 
         return $response_arr;

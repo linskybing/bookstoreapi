@@ -7,17 +7,66 @@ use PDO;
 
 class ProductService
 {
+    protected $imageservice;
+    protected $producttag;
     public function __construct($db)
     {
         $this->conn = $db;
         $this->obj = new Product();
+        $this->imageservice = new ProductImageService($db);
+        $this->producttag = new TagListService($db);
     }
 
     //讀取
-    public function read()
+    public function read($state, $search, $nowpage, $itemnum)
     {
 
-        $query = 'SELECT * FROM ' . $this->obj->table . ' WHERE DeletedAt IS NULL';
+        if ($search != null) {
+            $query = "SELECT p.ProductId,
+                            Name,
+                            Description,
+                            Price,
+                            Inventory,
+                            Image,
+                            State,
+                            Seller,
+                            Watch,
+                            p.CreatedAt ,
+                            Rent,
+                            MaxRent,
+                            RentPrice
+                    FROM product p
+                    LEFT JOIN productimage img
+                    ON p.ProductId = img.ProductId
+                    WHERE p.DeletedAt IS NULL AND
+                        State = '" . $state . "' OR
+                        Name LIKE '%" . $search . "%'
+                    GROUP BY ProductId
+                    ORDER BY CreatedAt	
+                    LIMIT " . (($nowpage - 1) * $itemnum) . "," . $nowpage * $itemnum . ';';
+        } else {
+            $query = "SELECT p.ProductId,
+                        Name,
+                        Description,
+                        Price,
+                        Inventory,
+                        Image,
+                        State,
+                        Seller,
+                        Watch,
+                        p.CreatedAt,
+                        Rent,
+                        MaxRent,
+                        RentPrice
+                FROM product p
+                LEFT JOIN productimage img
+                ON p.ProductId = img.ProductId
+                WHERE p.DeletedAt IS NULL AND
+                      State = '" . $state . "'
+                GROUP BY ProductId
+                ORDER BY CreatedAt	
+                LIMIT " . (($nowpage - 1) * $itemnum) . "," . $nowpage * $itemnum . ';';
+        }
 
         $stmt  = $this->conn->prepare($query);
 
@@ -35,16 +84,111 @@ class ProductService
                     'Description' => $Description,
                     'Price' => $Price,
                     'Inventory' => $Inventory,
+                    'Image' => $Image,
                     'State' => $State,
+                    'Rent' => $Rent,
+                    'MaxRent' => $MaxRent,
+                    'RentPrice' => $RentPrice,
                     'Seller' => $Seller,
                     'Watch' => $Watch,
                     'CreatedAt' => $CreatedAt,
-                    'UpdatedAt' => $UpdatedAt,
                 );
+
+                $data_item['Image'] = $this->imageservice->read($data_item['ProductId'])['data'];
+                $data_item['Category'] = $this->producttag->read($data_item['ProductId'])['data'];
                 array_push($response_arr['data'], $data_item);
             }
         } else {
-            $response_arr['info'] = '尚未有商品';
+            $response_arr['data'] = null;
+        }
+
+        return $response_arr;
+    }
+
+    public function read_seller($state, $search, $nowpage, $itemnum, $auth)
+    {
+        if ($search != null) {
+            $query = "SELECT p.ProductId,
+                            Name,
+                            Description,
+                            Price,
+                            Inventory,
+                            Image,
+                            State,
+                            Seller,
+                            Watch,
+                            p.CreatedAt,
+                            Rent,
+                            MaxRent,
+                            RentPrice
+                    FROM product p
+                    LEFT JOIN productimage img
+                    ON p.ProductId = img.ProductId
+                    WHERE p.DeletedAt IS NULL AND
+                        State = '" . $state . "' OR
+                        Name LIKE '%" . $search . "%' AND
+                        Seller = '" . $auth . "'
+                    GROUP BY ProductId
+                    ORDER BY CreatedAt	
+                    LIMIT " . (($nowpage - 1) * $itemnum) . "," . $nowpage * $itemnum . ';';
+        } else {
+            $query = "SELECT p.ProductId,
+                        Name,
+                        Description,
+                        Price,
+                        Inventory,
+                        Image,
+                        State,
+                        Seller,
+                        Watch,
+                        p.CreatedAt,
+                        Rent,
+                        MaxRent,
+                        RentPrice 
+                FROM product p
+                LEFT JOIN productimage img
+                ON p.ProductId = img.ProductId
+                WHERE p.DeletedAt IS NULL AND
+                      State = '" . $state . "' AND
+                    Seller = '" . $auth . "'
+                GROUP BY ProductId
+                ORDER BY CreatedAt	
+                LIMIT " . (($nowpage - 1) * $itemnum) . "," . $nowpage * $itemnum . ';';
+        }
+
+
+        $stmt  = $this->conn->prepare($query);
+
+        $result = $stmt->execute();
+
+        $num = $stmt->rowCount();
+        if ($num > 0) {
+            $response_arr = array();
+            $response_arr['data'] = array();
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                extract($row);
+                $data_item = array(
+                    'ProductId' => $ProductId,
+                    'Name' => $Name,
+                    'Description' => $Description,
+                    'Price' => $Price,
+                    'Inventory' => $Inventory,
+                    'Image' => $Image,
+                    'State' => $State,
+                    'Rent' => $Rent,
+                    'MaxRent' => $MaxRent,
+                    'RentPrice' => $RentPrice,
+                    'Seller' => $Seller,
+                    'Watch' => $Watch,
+                    'CreatedAt' => $CreatedAt,
+                );
+                $data_item['Image'] = $this->imageservice->read($data_item['ProductId'])['data'];
+                $data_item['Category'] = $this->producttag->read($data_item['ProductId'])['data'];
+
+                array_push($response_arr['data'], $data_item);
+            }
+        } else {
+            $response_arr['data'] = null;
         }
 
         return $response_arr;
@@ -70,16 +214,19 @@ class ProductService
                 'Description' => $Description,
                 'Price' => $Price,
                 'Inventory' => $Inventory,
+                'Image' => $Image,
                 'State' => $State,
+                'Rent' => $Rent,
+                'MaxRent' => $MaxRent,
+                'RentPrice' => $RentPrice,
                 'Seller' => $Seller,
                 'Watch' => $Watch,
                 'CreatedAt' => $CreatedAt,
-                'UpdatedAt' => $UpdatedAt,
             );
             $response_arr = $data;
             return $response_arr;
         } else {
-            $response_arr['info'] = '商品不存在';
+            $response_arr['data'] = null;
             return $response_arr;
         }
     }
@@ -171,6 +318,4 @@ class ProductService
             return $response_arr['info'] = '資料刪除失敗';
         }
     }
-
-
 }

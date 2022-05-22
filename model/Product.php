@@ -16,6 +16,9 @@ class Product
     public $State;
     public $Seller;
     public $Watch;
+    public $Rent;
+    public $MaxRent;
+    public $RentPrice;
     public $CreatedAt;
     public $UpdatedAt;
     public $DeletedAt;
