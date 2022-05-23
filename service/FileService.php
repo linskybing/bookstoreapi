@@ -27,7 +27,7 @@ class File
 
     public static function delete($dir, $filename)
     {
-        $path = 'C:\\xampp\\htdocs\\Restful_Api_0505_2\\public\\images\\' . $dir . '\\' . $filename;
+        $path = 'C:\\xampp\\htdocs\\Restful_Api_0511\\public\\images\\' . $dir . '\\' . $filename;
 
         if (!unlink($path)) {
             return false;

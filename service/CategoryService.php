@@ -32,6 +32,7 @@ class CategoryService
                 $data_item = array(
                     'CategoryId' => $CategoryId,
                     'Tag' => $Tag,
+                    'Color' => $Color,
                 );
                 array_push($response_arr['data'], $data_item);
             }
@@ -59,6 +60,7 @@ class CategoryService
             $data = array(
                 'CategoryId' => $CategoryId,
                 'Tag' => $Tag,
+                'Color' => $Color,
             );
 
             $response_arr = $data;

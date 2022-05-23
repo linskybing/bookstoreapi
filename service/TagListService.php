@@ -40,7 +40,7 @@ class TagListService
                 $data_item = array(
                     'Id' => $Id,
                     'CategoryId' => $CategoryId,
-                    'Tag' => $Tag,                    
+                    'Tag' => $Tag,
                 );
                 array_push($response_arr['data'], $data_item);
             }
@@ -54,7 +54,11 @@ class TagListService
     //讀取單筆資料
     public function read_single($Id)
     {
-        $query = "SELECT * FROM " . $this->obj->table . " WHERE Id = " . $Id . " AND DeletedAt IS NULL;";
+        $query = "SELECT t.* ,c.Tag
+                  FROM taglist t,
+                  category c
+                  WHERE t.CategoryId = c.CategoryId AND
+                        t.Id = " . $Id . " AND t.DeletedAt IS NULL;";
 
         $stmt = $this->conn->prepare($query);
 
@@ -67,8 +71,9 @@ class TagListService
 
             $data = array(
                 'Id' => $Id,
+                'ProductId' => $ProductId,
                 'CategoryId' => $CategoryId,
-                'Tag' => $Tag,
+                'Tag' => $Tag
             );
 
             $response_arr = $data;

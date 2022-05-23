@@ -48,7 +48,7 @@ class ProductImageController
                     $data['Image'] = $value;
                     array_push($result['info'], $this->imageservice->post($data));
                 }
-                return ['info' => '新增成功'];                
+                return ['info' => '新增成功'];
             } else {
                 return ['error' => '權限不足'];
             }
@@ -68,7 +68,7 @@ class ProductImageController
         if (isset($image['Image'])) {
             $file = File::delete('Products', $image['Image']);
             $data = $this->imageservice->delete($id);
-            return $data;
+            return  $file;
         } else {
             return ['error' => '商品圖片不存在'];
         }
