@@ -21,7 +21,8 @@ class TagListService
         $query = "SELECT t.Id,
                          t.CategoryId,
                          t.ProductId,
-                         c.Tag
+                         c.Tag,
+                         c.Color
                   FROM taglist t,
                         category c
                   WHERE t.CategoryId = c.CategoryId AND
@@ -41,6 +42,7 @@ class TagListService
                     'Id' => $Id,
                     'CategoryId' => $CategoryId,
                     'Tag' => $Tag,
+                    'Color'=>$Color
                 );
                 array_push($response_arr['data'], $data_item);
             }

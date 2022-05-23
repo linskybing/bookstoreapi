@@ -162,9 +162,9 @@ $router->get('/user/logout', function ($request, $controller) {
 
 //---------------------------------------------------------------------------------------------------------------------
 //Product
-$router->get('/product/{category}/{state}/{search}/{nowpage}/{itemnum}', function ($request, $controller, $state, $search, $nowpage, $itemnum) {
+$router->get('/product', function ($request, $controller) {
 
-    $result = $controller->Get($request, $state, $search, $nowpage, $itemnum);
+    $result = $controller->Get($request);
     return json_encode($result);
 }, $productcontroller);
 

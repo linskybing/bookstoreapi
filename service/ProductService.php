@@ -18,33 +18,8 @@ class ProductService
     }
 
     //讀取
-    public function read($category, $state, $search, $nowpage, $itemnum)
-    {
-
-        if ($search != null) {
-            $query = "SELECT p.ProductId,
-                            Name,
-                            Description,
-                            Price,
-                            Inventory,
-                            Image,
-                            State,
-                            Seller,
-                            Watch,
-                            p.CreatedAt ,
-                            Rent,
-                            MaxRent,
-                            RentPrice
-                    FROM product p
-                    LEFT JOIN productimage img
-                    ON p.ProductId = img.ProductId
-                    WHERE p.DeletedAt IS NULL AND
-                        State = '" . $state . "' OR
-                        Name LIKE '%" . $search . "%'
-                    GROUP BY ProductId
-                    ORDER BY CreatedAt	
-                    LIMIT " . (($nowpage - 1) * $itemnum) . "," . $nowpage * $itemnum . ';';
-        } else {
+    public function read()
+    {       
             $query = "SELECT p.ProductId,
                         Name,
                         Description,
@@ -62,45 +37,10 @@ class ProductService
                 LEFT JOIN productimage img
                 ON p.ProductId = img.ProductId
                 WHERE p.DeletedAt IS NULL AND
-                      State = '" . $state . "'
+                      State = 'on'
                 GROUP BY ProductId
-                ORDER BY CreatedAt	
-                LIMIT " . (($nowpage - 1) * $itemnum) . "," . $nowpage * $itemnum . ';';
-        }
-
-        if ($category != 'null') {
-            $query = "SELECT p.ProductId,
-                            Name,
-                            Description,
-                            Price,
-                            Inventory,
-                            Image,
-                            State,
-                            Seller,
-                            Watch,
-                            p.CreatedAt,
-                            Rent,
-                            MaxRent,
-                            RentPrice,
-                            T.*
-                    FROM product p
-                    LEFT JOIN productimage img
-                    ON p.ProductId = img.ProductId
-                    LEFT JOIN (SELECT t.Id,
-                                      t.CategoryId,
-                                      t.ProductId,
-                                      c.Tag
-                                      FROM taglist t,
-                                           category c
-                                      WHERE t.CategoryId = c.CategoryId)T
-                    ON p.ProductId = T.ProductId
-                    WHERE p.DeletedAt IS NULL AND
-                          State = '" . $state . "' AND
-                          Tag IN ('" . $category . "')
-                    GROUP BY p.ProductId
-                    ORDER BY CreatedAt	
-                    LIMIT " . (($nowpage - 1) * $itemnum) . "," . $nowpage * $itemnum . ';';
-        }
+                ORDER BY CreatedAt";
+       
 
         $stmt  = $this->conn->prepare($query);
 

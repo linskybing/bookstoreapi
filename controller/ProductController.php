@@ -21,10 +21,10 @@ class ProductController
         $this->producttag = new TagListService($db);
     }
 
-    public function Get($request, $category = null, $state, $search = null, $nowpage = 1, $itemnum = 10)
+    public function Get($request)
     {
 
-        $data = $this->productservice->read($category, $state, $search, $nowpage, $itemnum);
+        $data = $this->productservice->read();
         return $data;
     }
 
@@ -126,7 +126,7 @@ class ProductController
             if (isset($product['Seller'])) {
                 if (!Authentication::isCreator($product['Seller'], $auth)) {
 
-                    $data= $this->productservice->delete($id);
+                    $data = $this->productservice->delete($id);
                     return $data;
                 } else {
                     return ['error' => '權限不足'];
