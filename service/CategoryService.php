@@ -17,7 +17,11 @@ class CategoryService
     public function read()
     {
 
-        $query = 'SELECT * FROM ' . $this->obj->table . ' WHERE DeletedAt IS NULL';
+        $query = 'SELECT c.*,COUNT(t.CategoryId) AS Count
+                    FROM category c
+                    LEFT JOIN taglist t	  
+                    ON c.CategoryId = t.CategoryId
+                    GROUP	BY c.CategoryId';
 
         $stmt  = $this->conn->prepare($query);
 
@@ -33,6 +37,7 @@ class CategoryService
                     'CategoryId' => $CategoryId,
                     'Tag' => $Tag,
                     'Color' => $Color,
+                    'Count' => $Count
                 );
                 array_push($response_arr['data'], $data_item);
             }
