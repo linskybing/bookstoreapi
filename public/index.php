@@ -121,6 +121,11 @@ $router->patch('/user/address', function ($request, $controller) {
     return json_encode($result);
 }, $usercontroller);
 
+$router->patch('/user/update', function ($request, $controller) {
+    $result = $controller->UpdateUserDate($request);
+    return  json_encode($result);
+}, $usercontroller);
+
 $router->patch('/user/password', function ($request, $controller) {
 
     $result  = $controller->ChangePassword($request);

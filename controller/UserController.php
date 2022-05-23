@@ -45,7 +45,8 @@ class UserController
             'Address' => $data['Address'],
             'Email' => $data['Email'],
             'Imgae' => $data['Image'],
-            'Name' => $data['Name']
+            'Name' => $data['Name'],
+            'Address' => $data['Address']
         );
         return $return;
     }
@@ -153,6 +154,29 @@ class UserController
             $result['error'] = '更新大頭貼失敗';
         }
 
+
+        return $result;
+    }
+
+    //更新使用者資訊
+    public function UpdateUserDate($request)
+    {
+        $auth = Authentication::isAuth();
+        if (isset($auth['error'])) return $auth;
+
+        $data = $request->getBody();
+
+        $validate = Validator::check(array(
+            'Name' => ['required'],
+            'Address' => ['required']
+        ), $data);
+
+        if ($validate != '') {
+
+            $result =  $validate;
+        } else {
+            $result['info'] = $this->userservice->update($auth, array('Name' => $data['Name'], 'Address' => $data['Address']));
+        }
 
         return $result;
     }
