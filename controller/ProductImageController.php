@@ -39,7 +39,7 @@ class ProductImageController
 
         $product = $this->productservice->read_single($id);
         if (isset($product['Seller'])) {
-            if (Authentication::isCreator($product['Seller'], $auth)) {
+            if (!Authentication::isCreator($product['Seller'], $auth)) {
                 $result['info'] = array();
                 $data['ProductId'] = $id;
                 $id = $this->imageservice->getlastnum();
@@ -48,7 +48,7 @@ class ProductImageController
                     $data['Image'] = $value;
                     array_push($result['info'], $this->imageservice->post($data));
                 }
-                return $result;
+                return ['info' => '新增成功'];                
             } else {
                 return ['error' => '權限不足'];
             }
@@ -63,8 +63,10 @@ class ProductImageController
         $auth = Authentication::isAuth();
         if (isset($auth['error'])) return $auth;
 
-       
+        $image = $this->imageservice->read_single($id);
+
         if (isset($image['Image'])) {
+            $file = File::delete('Products', $image['Image']);
             $data = $this->imageservice->delete($id);
             return $data;
         } else {

@@ -23,10 +23,9 @@ class ProductController
 
     public function Get($request, $category = null, $state, $search = null, $nowpage = 1, $itemnum = 10)
     {
-       
-            $data = $this->productservice->read($category, $state, $search, $nowpage, $itemnum);
-            return $data;
-       
+
+        $data = $this->productservice->read($category, $state, $search, $nowpage, $itemnum);
+        return $data;
     }
 
     public function Get_Seller($request, $state, $search, $nowpage = 1, $itemnum = 10)
@@ -77,12 +76,13 @@ class ProductController
             ), $data);
 
             if ($validate != '') {
-                $result = $validate;
+                $result['error'] = '資料欄位不可為空';
             } else {
 
                 $data['Seller'] = $auth;
 
-                $result = $this->productservice->post($data);
+                $this->productservice->post($data);
+                $result['info'] = '新增成功';
             }
 
             return $result;
@@ -101,7 +101,7 @@ class ProductController
 
             $product = $this->productservice->read_single($id);
             if (isset($product['Seller'])) {
-                if (Authentication::isCreator($product['Seller'], $auth)) {
+                if (!Authentication::isCreator($product['Seller'], $auth)) {
 
                     $result['info'] = $this->productservice->update($id, $data);
                     return $result;
@@ -109,7 +109,7 @@ class ProductController
                     return ['error' => '權限不足'];
                 }
             } else {
-                return ['error' => '商品不存在'];
+                return ['error' => $auth];
             }
         } catch (Exception $e) {
             return ['error' => '發生錯誤，請查看參數是否正確'];

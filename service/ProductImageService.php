@@ -31,9 +31,7 @@ class ProductImageService
                 extract($row);
                 $data_item = array(
                     'ImageId' => $ImageId,
-                    'ProductId' => $ProductId,
                     'Image' => $Image,
-                    'CreatedAt' => $CreatedAt,
                 );
                 array_push($response_arr['data'], $data_item);
             }
@@ -60,9 +58,7 @@ class ProductImageService
 
             $data = array(
                 'ImageId' => $ImageId,
-                'ProductId' => $ProductId,
                 'Image' => $Image,
-                'CreatedAt' => $CreatedAt,
             );
             $response_arr = $data;
             return $response_arr;
@@ -108,7 +104,7 @@ class ProductImageService
     //刪除
     public function delete($ImageId)
     {
-        
+
         $query = 'DELETE FROM ' . $this->obj->table . " WHERE ImageId = " . $ImageId . ";";
 
         $stmt = $this->conn->prepare($query);
@@ -116,10 +112,11 @@ class ProductImageService
         $result = $stmt->execute();
 
         if ($result) {
-            $response_arr['info'] = '資料刪除成功';
+            $response_arr['info'] = '圖片刪除成功';
             return $response_arr;
         } else {
-            return $response_arr['info'] = '資料刪除失敗';
+            $response_arr['error'] = '資料刪除失敗';
+            return $response_arr;
         }
     }
 
