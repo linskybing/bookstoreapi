@@ -124,9 +124,9 @@ class ProductController
 
             $product = $this->productservice->read_single($id);
             if (isset($product['Seller'])) {
-                if (Authentication::isCreator($product['Seller'], $auth)) {
+                if (!Authentication::isCreator($product['Seller'], $auth)) {
 
-                    $data['info'] = $this->productservice->delete($id);
+                    $data= $this->productservice->delete($id);
                     return $data;
                 } else {
                     return ['error' => '權限不足'];

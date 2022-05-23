@@ -339,6 +339,10 @@ class ProductService
     public function delete($ProductId)
     {
         date_default_timezone_set('Asia/Taipei');
+        if (!$this->deletecheck($ProductId)) {
+            $response_arr['error'] = '該商品已有交易紀錄，不可刪除';
+            return $response_arr;
+        }
         $query = 'UPDATE ' . $this->obj->table . " SET DeletedAt = '" . date('Y-m-d H:i:s') . "' WHERE ProductId = " . $ProductId . ";";
 
         $stmt = $this->conn->prepare($query);
@@ -346,9 +350,29 @@ class ProductService
         $result = $stmt->execute();
 
         if ($result) {
-            return $response_arr['info'] = '資料刪除成功';
+            $response_arr['info'] = '資料刪除成功';
         } else {
-            return $response_arr['info'] = '資料刪除失敗';
+            $response_arr['info'] = '資料刪除失敗';
         }
+        return $response_arr;
+    }
+
+    public function deletecheck($ProductId)
+    {
+        $query = "SELECT *
+                FROM product p,
+                    shoppinglist sl,
+                    recorddeal rd
+                WHERE p.ProductId = sl.ProductId AND
+                    sl.ShoppingId = rd.ShoppingId AND
+                    p.ProductId = " . $ProductId . "
+        ";
+
+        $stmt = $this->conn->prepare($query);
+
+        $result = $stmt->execute();
+
+        if ($stmt->rowCount() > 0) return false;
+        return true;
     }
 }
