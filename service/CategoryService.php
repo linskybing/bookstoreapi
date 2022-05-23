@@ -32,9 +32,6 @@ class CategoryService
                 $data_item = array(
                     'CategoryId' => $CategoryId,
                     'Tag' => $Tag,
-                    'CreatedAt' => $CreatedAt,
-                    'UpdatedAt' => $UpdatedAt,
-                    'DeletedAt' => $DeletedAt
                 );
                 array_push($response_arr['data'], $data_item);
             }
@@ -62,9 +59,6 @@ class CategoryService
             $data = array(
                 'CategoryId' => $CategoryId,
                 'Tag' => $Tag,
-                'CreatedAt' => $CreatedAt,
-                'UpdatedAt' => $UpdatedAt,
-                'DeletedAt' => $DeletedAt
             );
 
             $response_arr = $data;
@@ -81,8 +75,8 @@ class CategoryService
 
         date_default_timezone_set('Asia/Taipei');
 
-        $query = "INSERT INTO " . $this->obj->table . 
-                           "(Tag,                          
+        $query = "INSERT INTO " . $this->obj->table .
+            "(Tag,                          
                            CreatedAt,
                            UpdatedAt) 
                            VALUES ( ? , ? , ? )";
@@ -100,7 +94,7 @@ class CategoryService
         if ($result) {
 
             $id = $this->conn->lastInsertId();
-            $response_arr= $this->read_single($id);
+            $response_arr = $this->read_single($id);
         } else {
 
             $response_arr['error'] = '資料新增失敗';
