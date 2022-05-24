@@ -244,11 +244,64 @@ class ProductService
 
         return $response_arr;
     }
-
-    //讀取單筆資料
-    public function read_single($ProductId)
+    public function incart($ProductId, $auth = null)
     {
-        $query = "SELECT * FROM " . $this->obj->table . " WHERE ProductId = " . $ProductId . " AND DeletedAt IS NULL;";
+        $query  = "
+        SELECT p.ProductId IN (SELECT ProductId
+								FROM shoppingcart sc,
+                        	  shoppinglist sl
+                        WHERE sc.CartId = sl.CartId AND
+                              State = '未結帳' AND
+                              Member = '" . $auth . "') AS InCart 
+        FROM product p
+        WHERE p.ProductId = " . $ProductId . "
+        LIMIT 1;
+        ";
+
+        $stmt  = $this->conn->prepare($query);
+
+        $result = $stmt->execute();
+
+        $num = $stmt->rowCount();
+
+        if ($num > 0) {
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            extract($row);
+        }
+
+        return ($InCart > 0);
+    }
+    //讀取單筆資料
+    public function read_single($ProductId, $auth = null)
+    {
+        $query = "
+                        SELECT p.ProductId,
+                            Name,
+                            Description,
+                            Price,
+                            Inventory,
+                            Image,
+                            State,
+                            Seller,
+                            Watch,
+                            p.CreatedAt,
+                            Rent,
+                            MaxRent,
+                            RentPrice,
+                            p.ProductId IN (SELECT ProductId
+                                            FROM shoppingcart sc,
+                                                 shoppinglist sl
+                                            WHERE sc.CartId = sl.CartId AND
+                                                  State = '未結帳' AND
+                                                  Member = '" . $auth . "') AS InCart                        
+                        FROM product p
+                        LEFT JOIN productimage img
+                        ON p.ProductId = img.ProductId
+                        WHERE p.DeletedAt IS NULL AND
+                            State = 'on'
+                        GROUP BY ProductId
+                        ORDER BY CreatedAt
+        ";
 
         $stmt = $this->conn->prepare($query);
 
@@ -266,6 +319,7 @@ class ProductService
                 'Price' => $Price,
                 'Inventory' => $Inventory,
                 'State' => $State,
+                'InCart' => $InCart,
                 'Rent' => $Rent,
                 'MaxRent' => $MaxRent,
                 'RentPrice' => $RentPrice,

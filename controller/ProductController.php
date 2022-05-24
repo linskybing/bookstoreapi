@@ -72,7 +72,12 @@ class ProductController
     public function Get_Single($request, $id)
     {
         try {
-            $data = $this->productservice->read_single($id);
+            $auth = Authentication::isAuth();
+            if (isset($auth['error'])) {
+                $data = $this->productservice->read_single($id, null);
+            } else {
+                $data = $this->productservice->read_single($id, $auth);
+            }
             if (isset($data['ProductId'])) {
                 $img = $this->imageservice->read($data['ProductId']);
                 $category = $this->producttag->read($data['ProductId']);
@@ -84,7 +89,7 @@ class ProductController
             $data['SellerActive'] = $user['Active'];
             if (isset($img['data'])) $data['Image'] = $img['data'];
             if (isset($category['data'])) $data['Category'] = $category['data'];
-            if(isset($reivew['data']))$data['Review'] = $reivew['data'];
+            if (isset($reivew['data'])) $data['Review'] = $reivew['data'];
             return $data;
         } catch (Exception $e) {
             return ['error' => '發生錯誤，請查看參數是否正確'];
@@ -168,5 +173,17 @@ class ProductController
         } catch (Exception $e) {
             return ['error' => '發生錯誤，請查看參數是否正確'];
         }
+    }
+
+    public function InCart($request, $id)
+    {
+        $auth = Authentication::isAuth();
+        if (isset($auth['error'])) {
+            $data = $this->productservice->incart($id, null);
+        } else {
+            $data = $this->productservice->incart($id, $auth);
+        }
+
+        return $data;
     }
 }

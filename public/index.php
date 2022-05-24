@@ -167,6 +167,14 @@ $router->get('/product', function ($request, $controller) {
     $result = $controller->Get($request);
     return json_encode($result);
 }, $productcontroller);
+
+$router->get('/incart/{id}', function ($request, $controller, $id) {
+
+    $result = $controller->InCart($request, $id);
+    return json_encode($result);
+}, $productcontroller);
+
+
 $router->get('/product_rent', function ($request, $controller) {
 
     $result = $controller->Get_Rent($request);
