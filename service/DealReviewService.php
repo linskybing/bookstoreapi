@@ -17,12 +17,16 @@ class DealReviewService
     public function readbyproduct($id)
     {
 
-        $query = "SELECT dr.* 
-                  FROM RecordDeal rd,
-                       DealReview dr,
-                       ShoppingList sl
-                  WHERE rd.RecordId = dr.RecordId AND
-                        rd.ShoppingId = sl.ShoppingId AND
+        $query = "SELECT dr.* ,u.Image
+                    FROM RecordDeal rd,
+                        DealReview dr,
+                        ShoppingList sl,
+                        shoppingcart sc,
+                        users u
+                    WHERE rd.RecordId = dr.RecordId AND
+                        rd.ShoppingId = sl.ShoppingId AND 
+                        sc.CartId = sl.CartId AND 
+                        sc.Member = u.Account AND
                         sl.ProductId = " . $id;
 
         $stmt  = $this->conn->prepare($query);
@@ -40,6 +44,7 @@ class DealReviewService
                     'RecordId' => $RecordId,
                     'CustomerScore' => $CustomerScore,
                     'CustomerReview' => $CustomerReview,
+                    'Image' => $Image,
                     'CustomerTime' => $CustomerTime,
                     'SellerScore' => $SellerScore,
                     'SellerReview' => $SellerReview,
@@ -48,7 +53,7 @@ class DealReviewService
                 array_push($response_arr['data'], $data_item);
             }
         } else {
-            $response_arr['info'] = '商品尚未擁有評價';
+            $response_arr['data'] = null;
         }
 
         return $response_arr;

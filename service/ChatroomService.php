@@ -237,6 +237,37 @@ class ChatRoomService
         }
     }
 
+    //讀取單筆資料
+    public function read_single_user($seller, $user)
+    {
+        $query = "SELECT * FROM " . $this->obj->table . " WHERE Seller = '" . $seller . "' AND User = '" . $user . "' AND DeletedAt IS NULL;";
+
+        $stmt = $this->conn->prepare($query);
+
+        $result = $stmt->execute();
+
+
+        if ($stmt->rowCount() > 0) {
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            extract($row);
+
+            $data = array(
+                'RoomId' => $RoomId,
+                'Seller' => $Seller,
+                'User' => $User,
+                'CreatedAt' => $CreatedAt,
+                'UpdatedAt' => $UpdatedAt,
+                'DeletedAt' => $DeletedAt
+            );
+
+            $response_arr = $data;
+            return $response_arr;
+        } else {
+            $response_arr['info'] = '聊天室不存在';
+            return $response_arr;
+        }
+    }
+
     //上傳
     public function post($data)
     {
@@ -272,7 +303,7 @@ class ChatRoomService
             }
         } else {
 
-            $response_arr['error'] = '已經建立過聊天室';
+            $response_arr['data'] = $this->read_single_user($data['Seller'], $data['User']);
         }
 
         return $response_arr;

@@ -4,6 +4,8 @@ namespace Controller;
 
 use Exception;
 use Service\Authentication;
+use Service\DealRecordService;
+use Service\DealReviewService;
 use Service\ProductImageService;
 use Service\Validator;
 use Service\ProductService;
@@ -14,17 +16,38 @@ class ProductController
     protected $productservice;
     protected $imageservice;
     protected $producttag;
+    protected $dealservice;
+    protected $dealreviewservice;
     public function __construct($db)
     {
         $this->productservice = new ProductService($db);
         $this->imageservice = new ProductImageService($db);
         $this->producttag = new TagListService($db);
+        $this->dealservice = new DealRecordService($db);
+        $this->dealreviewservice = new DealReviewService($db);
     }
 
     public function Get($request)
     {
+        $auth = Authentication::isAuth();
+        if (isset($auth['error'])) {
+            $data = $this->productservice->read(null);
+        } else {
+            $data = $this->productservice->read($auth);
+        }
 
-        $data = $this->productservice->read();
+        return $data;
+    }
+
+    public function Get_Rent($request)
+    {
+        $auth = Authentication::isAuth();
+        if (isset($auth['error'])) {
+            $data = $this->productservice->read_rent(null);
+        } else {
+            $data = $this->productservice->read_rent($auth);
+        }
+
         return $data;
     }
 
@@ -50,10 +73,12 @@ class ProductController
             if (isset($data['ProductId'])) {
                 $img = $this->imageservice->read($data['ProductId']);
                 $category = $this->producttag->read($data['ProductId']);
+                $reivew = $this->dealreviewservice->readbyproduct($data['ProductId']);
             }
 
             if (isset($img['data'])) $data['Image'] = $img['data'];
             if (isset($category['data'])) $data['Category'] = $category['data'];
+            if(isset($reivew['data']))$data['Review'] = $reivew['data'];
             return $data;
         } catch (Exception $e) {
             return ['error' => '發生錯誤，請查看參數是否正確'];

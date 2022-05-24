@@ -167,7 +167,11 @@ $router->get('/product', function ($request, $controller) {
     $result = $controller->Get($request);
     return json_encode($result);
 }, $productcontroller);
+$router->get('/product_rent', function ($request, $controller) {
 
+    $result = $controller->Get_Rent($request);
+    return json_encode($result);
+}, $productcontroller);
 $router->get('/products/{state}/{search}/{nowpage}/{itemnum}', function ($request, $controller, $state, $search, $nowpage, $itemnum) {
 
     $result = $controller->Get_Seller($request, $state, $search, $nowpage, $itemnum);
