@@ -3,6 +3,7 @@
 namespace Controller;
 
 use Service\Authentication;
+use Service\ProductService;
 use Service\RoleService;
 use Service\ShoppingListService;
 use Service\Validator;
@@ -11,15 +12,16 @@ use Service\Validator;
 class ShoppingListController
 {
     protected $listservice;
+    protected $productservice;
     public function __construct($db)
     {
         $this->listservice = new ShoppingListService($db);
+        $this->productservice = new ProductService($db);
     }
     public function Get($request)
     {
         $auth = Authentication::getPayload();
         if (isset($auth['error'])) return $auth;
-
         $data = $this->listservice->read($auth['CartId']);
 
         return $data;
@@ -44,12 +46,16 @@ class ShoppingListController
         $validate = Validator::check(array(
             'ProductId' => ['required'],
             'Count' => ['required'],
+            'Type' => ['required']
         ), $data);
         $data['CartId'] = $auth['CartId'];
 
         if ($validate != '') {
             return $validate;
         } else {
+            $product = $this->productservice->read_single($data['ProductId']);
+            $count = $product['Inventory'];
+            $this->productservice->update($data['ProductId'], array('Inventory' => ($count - 1)));
             $result = $this->listservice->post($data);
             return $result;
         }

@@ -50,7 +50,7 @@ class ChatRecordService
                 array_push($response_arr['data'], $data_item);
             }
         } else {
-            $response_arr['info'] = '尚未有留言';
+            $response_arr['data'] = null;
         }
 
         return $response_arr;

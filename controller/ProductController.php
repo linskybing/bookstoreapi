@@ -10,6 +10,7 @@ use Service\ProductImageService;
 use Service\Validator;
 use Service\ProductService;
 use Service\TagListService;
+use Service\UserService;
 
 class ProductController
 {
@@ -18,6 +19,7 @@ class ProductController
     protected $producttag;
     protected $dealservice;
     protected $dealreviewservice;
+    protected $userservice;
     public function __construct($db)
     {
         $this->productservice = new ProductService($db);
@@ -25,6 +27,7 @@ class ProductController
         $this->producttag = new TagListService($db);
         $this->dealservice = new DealRecordService($db);
         $this->dealreviewservice = new DealReviewService($db);
+        $this->userservice = new UserService($db);
     }
 
     public function Get($request)
@@ -74,8 +77,11 @@ class ProductController
                 $img = $this->imageservice->read($data['ProductId']);
                 $category = $this->producttag->read($data['ProductId']);
                 $reivew = $this->dealreviewservice->readbyproduct($data['ProductId']);
+                $user = $this->userservice->read_single($data['Seller']);
             }
-
+            $data['SellerImg'] = $user['Image'];
+            $data['SellerName'] = $user['Name'];
+            $data['SellerActive'] = $user['Active'];
             if (isset($img['data'])) $data['Image'] = $img['data'];
             if (isset($category['data'])) $data['Category'] = $category['data'];
             if(isset($reivew['data']))$data['Review'] = $reivew['data'];

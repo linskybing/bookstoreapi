@@ -76,6 +76,7 @@ class UserService
                 'Balance' => $Balance,
                 'Address' => $Address,
                 'Image' => $Image,
+                'Active' => $Active,
                 'CreatedAt' => $CreatedAt,
                 'UpdatedAt' => $UpdatedAt,
                 'DeletedAt' => $DeletedAt,

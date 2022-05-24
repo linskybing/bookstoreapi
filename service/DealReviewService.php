@@ -17,7 +17,7 @@ class DealReviewService
     public function readbyproduct($id)
     {
 
-        $query = "SELECT dr.* ,u.Image
+        $query = "SELECT dr.* ,u.Image,u.Name
                     FROM RecordDeal rd,
                         DealReview dr,
                         ShoppingList sl,
@@ -42,6 +42,7 @@ class DealReviewService
                 $data_item = array(
                     'ReviewId' => $ReviewId,
                     'RecordId' => $RecordId,
+                    'Name' => $Name,
                     'CustomerScore' => $CustomerScore,
                     'CustomerReview' => $CustomerReview,
                     'Image' => $Image,

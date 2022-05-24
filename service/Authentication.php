@@ -22,9 +22,10 @@ class Authentication
 
     public static function getPayload()
     {
-        $headers = apache_request_headers();        
+        $headers = apache_request_headers();
         if (isset($headers['Authorization'])) {
-            $data = Jwt::verifyToken($headers['Authorization']);            
+
+            $data = Jwt::verifyToken($headers['Authorization']);           
             return $data;
         } else {
             $error['error'] = '未通過權限驗證';

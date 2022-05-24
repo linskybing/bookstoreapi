@@ -17,7 +17,27 @@ class ShoppingListService
     public function read($id)
     {
 
-        $query = 'SELECT * FROM ' . $this->obj->table . " WHERE CartId = " . $id . " AND DeletedAt IS NULL";
+        $query = "SELECT sl.ShoppingId,
+                            sl.CartId,	    
+                            Count,
+                            Type,
+                            pl.*	    
+                    FROM shoppinglist sl,
+                        (SELECT p.ProductId,
+                            p.Name,
+                            p.Price,
+                            p.Rent,
+                            p.MaxRent,
+                            p.RentPrice,
+                            p.Inventory,
+                            pg.ImageId,
+                            pg.Image
+                            FROM product p
+                            LEFT JOIN productimage pg
+                            ON p.ProductId = pg.ProductId
+                            GROUP BY p.ProductId)pl
+                    WHERE sl.ProductId = pl.ProductId AND
+                            State = '未結帳' AND sl.CartId = " . $id;
 
         $stmt  = $this->conn->prepare($query);
 
@@ -33,11 +53,16 @@ class ShoppingListService
                     'ShoppingId' => $ShoppingId,
                     'CartId' => $CartId,
                     'ProductId' => $ProductId,
-                    'Count' => $Count,
-                    'State' => $State,
-                    'CreatedAt' => $CreatedAt,
-                    'UpdatedAt' => $UpdatedAt,
-                    'DeletedAt' => $DeletedAt
+                    'Name' => $Name,
+                    'Price' => $Price,
+                    'Inventory' => $Inventory,
+                    'Rent' => $Rent,
+                    'MaxRent' => $MaxRent,
+                    'RentPrice' => $RentPrice,
+                    'ImageId' => $ImageId,
+                    'Image' => $Image,
+                    'Type' => $Type,
+                    'Count' => $Count, 
                 );
                 array_push($response_arr['data'], $data_item);
             }
@@ -90,10 +115,11 @@ class ShoppingListService
         $query = "INSERT INTO " . $this->obj->table . "
                            (CartId,
                            ProductId,
-                           Count,                   
+                           Count,
+                           Type,                   
                            CreatedAt,
                            UpdatedAt) 
-                           VALUES ( ? , ? , ? , ? , ?)";
+                           VALUES ( ? , ? , ? , ? , ? , ?)";
 
         $stmt = $this->conn->prepare($query);
 
@@ -103,6 +129,7 @@ class ShoppingListService
             $data['CartId'],
             $data['ProductId'],
             $data['Count'],
+            $data['Type'],
             $time,
             $time
         ));
