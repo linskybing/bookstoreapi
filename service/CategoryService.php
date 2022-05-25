@@ -48,6 +48,44 @@ class CategoryService
         return $response_arr;
     }
 
+    //
+    public function read_tag()
+    {
+        $query = "SELECT c.*,COUNT(t.CategoryId) AS Count
+                  FROM category c
+                  LEFT JOIN (SELECT tl.*
+                             FROM taglist tl,
+                                  product pl
+                             WHERE tl.ProductId =  pl.ProductId AND
+                                   Rent > 0)t	  
+                    ON c.CategoryId = t.CategoryId
+                    GROUP BY c.CategoryId
+        ";
+        $stmt  = $this->conn->prepare($query);
+
+        $result = $stmt->execute();
+
+        $num = $stmt->rowCount();
+        if ($num > 0) {
+            $response_arr = array();
+            $response_arr['data'] = array();
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                extract($row);
+                $data_item = array(
+                    'CategoryId' => $CategoryId,
+                    'Tag' => $Tag,
+                    'Color' => $Color,
+                    'Count' => $Count
+                );
+                array_push($response_arr['data'], $data_item);
+            }
+        } else {
+            $response_arr['info'] = '尚未有分類';
+        }
+
+        return $response_arr;
+    }
+
     //讀取單筆資料
     public function read_single($CategoryId)
     {

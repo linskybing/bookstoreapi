@@ -15,14 +15,24 @@ class DealRecordController
         $this->dealservice = new DealRecordService($db);
     }
 
-    public function Get($request, $state)
+    public function Get($request)
     {
         $auth = Authentication::getPayload();
         if (isset($auth['error'])) return $auth;
 
-        $data = $this->dealservice->read($auth['CartId'] , $state);
+        $data = $this->dealservice->read($auth['CartId']);
         return $data;
     }
+
+    public function Get_Seller($request)
+    {
+        $auth = Authentication::isAuth();
+        if (isset($auth['error'])) return $auth;
+
+        $data = $this->dealservice->read_seller($auth);
+        return $data;
+    }
+
 
     public function Get_Single($request, $id)
     {
@@ -43,6 +53,7 @@ class DealRecordController
         $validate = Validator::check(array(
             'ShoppingId' => ['required'],
             'State' => ['required'],
+            'Phone' => ['required'],
             'DealMethod' => ['required'],
             'SentAddress' => ['required'],
             'DealType' => ['required'],

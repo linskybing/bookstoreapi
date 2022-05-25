@@ -23,7 +23,6 @@ class TagListController
         $data = $this->tagservice->read($product);
         return $data;
     }
-
     public function Get_Single($request, $id)
     {
         $data = $this->tagservice->read_single($id);
@@ -57,7 +56,7 @@ class TagListController
         $auth = Authentication::isAuth();
         if (isset($auth['error'])) return $auth;
 
-        $data = $this->tagservice->read_single($id);       
+        $data = $this->tagservice->read_single($id);
         $product = $this->productservice->read_single($data['ProductId']);
         if (Authentication::isCreator($product['Seller'], $auth)) return ['error' => '權限不足'];
 

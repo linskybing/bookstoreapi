@@ -27,6 +27,12 @@ class CategoryController
         return $data;
     }
 
+    public function Get_Rent($request)
+    {
+        $data = $this->categoryservice->read_tag();
+        return $data;
+    }
+
     public function Post($request)
     {
         $auth = Authentication::getPayload();

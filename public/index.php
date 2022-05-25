@@ -347,6 +347,12 @@ $router->get('/category', function ($request, $controller) {
     return json_encode($result);
 }, $categorycontroller);
 
+$router->get('/categoryforrent', function ($request, $controller) {
+
+    $result = $controller->Get_Rent($request);
+    return json_encode($result);
+}, $categorycontroller);
+
 $router->post('/category', function ($request, $controller) {
 
     $result = $controller->Post($request);
@@ -543,9 +549,14 @@ $router->delete('/chatroomr/{id}', function ($request, $controller, $id) {
 //---------------------------------------------------------------------------------------------------------------------
 //DealRecord
 
-$router->get('/dealr/{state}', function ($request, $controller, $state) {
+$router->get('/dealr', function ($request, $controller) {
 
-    $result = $controller->Get($request, $state);
+    $result = $controller->Get($request);
+    return json_encode($result);
+}, $dealcontroller);
+$router->get('/dealrs', function ($request, $controller) {
+
+    $result = $controller->Get_Seller($request);
     return json_encode($result);
 }, $dealcontroller);
 

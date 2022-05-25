@@ -15,11 +15,11 @@ class DealRecordService
     }
 
     //讀取
-    public function read($cartid, $state)
+    public function read($cartid)
     {
 
-        $query = "SELECT * FROM RecordDeal r , ShoppingList s WHERE r.ShoppingId = s.ShoppingId AND CartId = " . $cartid . " AND r.State = '" . urldecode($state) . "'";
-        
+        $query = "SELECT r.* FROM RecordDeal r , ShoppingList s WHERE r.ShoppingId = s.ShoppingId AND CartId = " . $cartid . " ORDER BY r.CreatedAt DESC";
+
         $stmt  = $this->conn->prepare($query);
 
         $result = $stmt->execute();
@@ -50,6 +50,53 @@ class DealRecordService
 
         return $response_arr;
     }
+
+    //讀取賣家
+    public function read_seller($auth)
+    {
+
+        $query = "SELECT r.*
+                    FROM RecordDeal r ,
+                        shoppinglist s,
+                        product p,
+                        users u
+                    WHERE r.ShoppingId = s.ShoppingId AND
+                            p.ProductId = s.ProductId AND
+                            p.Seller = u.Account AND
+                            u.Account = '" . $auth . "'
+                    ORDER BY r.CreatedAt DESC";
+
+        $stmt  = $this->conn->prepare($query);
+
+        $result = $stmt->execute();
+
+        $num = $stmt->rowCount();
+        if ($num > 0) {
+            $response_arr = array();
+            $response_arr['data'] = array();
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                extract($row);
+                $data_item = array(
+                    'RecordId' => $RecordId,
+                    'ShoppingId' => $ShoppingId,
+                    'State' => $State,
+                    'DealMethod' => $DealMethod,
+                    'SentAddress' => $SentAddress,
+                    'DealType' => $DealType,
+                    'StartTime' => $StartTime,
+                    'EndTime' => $EndTime,
+                    'CreatedAt' => $CreatedAt,
+                    'UpdatedAt' => $UpdatedAt,
+                );
+                array_push($response_arr['data'], $data_item);
+            }
+        } else {
+            $response_arr['info'] = '尚未有交易紀錄';
+        }
+
+        return $response_arr;
+    }
+
 
     //讀取單筆資料
     public function read_single($RecordId)
@@ -96,11 +143,12 @@ class DealRecordService
                            (ShoppingId, 
                            State,
                            DealMethod,  
+                           Phone,
                            SentAddress,
                            DealType,                                                                 
                            CreatedAt,
                            UpdatedAt) 
-                  VALUES ( ? , ? , ? , ? , ? , ? , ?)";
+                  VALUES ( ? , ? , ? , ? , ? , ? , ? , ?)";
 
         $stmt = $this->conn->prepare($query);
 
@@ -110,6 +158,7 @@ class DealRecordService
             $data['ShoppingId'],
             $data['State'],
             $data['DealMethod'],
+            $data['Phone'],
             $data['SentAddress'],
             $data['DealType'],
             $time,
