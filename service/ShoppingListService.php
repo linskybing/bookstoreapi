@@ -62,14 +62,14 @@ class ShoppingListService
                     'ImageId' => $ImageId,
                     'Image' => $Image,
                     'Type' => $Type,
-                    'Count' => $Count, 
+                    'Count' => $Count,
                 );
                 array_push($response_arr['data'], $data_item);
             }
         } else {
             $response_arr['info'] = '尚未有商品';
         }
-
+        
         return $response_arr;
     }
 
@@ -176,18 +176,13 @@ class ShoppingListService
     }
 
     //刪除
-    public function delete($ShoppingId)
+    public function delete($ProductId)
     {
         date_default_timezone_set('Asia/Taipei');
-        $list = $this->read_single($ShoppingId);
-
-        if ($list['State'] != '未結帳') {
-            $query = 'UPDATE ' . $this->obj->table . " SET DeletedAt = '" . date('Y-m-d H:i:s') . "' WHERE ShoppingId = " . $ShoppingId . ";";
-        } else {
-            $query = 'DELETE FROM ' . $this->obj->table . " WHERE ShoppingId = " . $ShoppingId . ";";
-        }
 
 
+        $query = 'DELETE FROM ' . $this->obj->table . " WHERE ProductId = " . $ProductId . " AND State = '未結帳';";
+        
         $stmt = $this->conn->prepare($query);
 
         $result = $stmt->execute();

@@ -68,8 +68,8 @@ class ShoppingListController
 
         $data = $request->getBody();
 
-
-        $list = $this->listservice->read_single($id);
+        
+        $list = $this->listservice->read_single($id);        
         if (Authentication::isCreator($list["CartId"], $auth['CartId'])) return ['error' => '權限不足'];
         if (isset($list['ShoppingId'])) {
             $result['info'] = $this->listservice->update($id, $data);
@@ -84,9 +84,15 @@ class ShoppingListController
         $auth = Authentication::getPayload();
         if (isset($auth['error'])) return $auth;
 
-        $data = $this->listservice->read_single($id);
-        if (Authentication::isCreator($data["CartId"], $auth['CartId'])) return ['error' => '權限不足'];
-        if (isset($data['ShoppingId'])) {
+        $data = $this->productservice->read_cartid($id);
+        if (isset($CartId)) {
+            if (Authentication::isCreator($data["CartId"], $auth['CartId'])) return ['error' => '權限不足'];
+        }
+
+        if (isset($data['ProductId'])) {
+            $product = $this->productservice->read_single($data['ProductId']);
+            $count = $product['Inventory'];
+            $this->productservice->update($data['ProductId'], array('Inventory' => ($count - 1)));
             $result = $this->listservice->delete($id);
             return $result;
         } else {

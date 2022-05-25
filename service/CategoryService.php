@@ -21,7 +21,7 @@ class CategoryService
                     FROM category c
                     LEFT JOIN taglist t	  
                     ON c.CategoryId = t.CategoryId
-                    GROUP	BY c.CategoryId';
+                    GROUP BY c.CategoryId';
 
         $stmt  = $this->conn->prepare($query);
 

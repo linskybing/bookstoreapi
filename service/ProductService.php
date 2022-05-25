@@ -271,6 +271,25 @@ class ProductService
 
         return ($InCart > 0);
     }
+
+    public function read_cartid($ProductId)
+    {
+        $query = "SELECT ProductId,CartId FROM ShoppingList sl WHERE sl.ProductId =  " . $ProductId . " AND State = '未結帳'";
+
+        $stmt  = $this->conn->prepare($query);
+
+        $result = $stmt->execute();
+
+        $num = $stmt->rowCount();
+
+        if ($num > 0) {
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            extract($row);
+            return array('CartId' => $CartId, 'ProductId' => $ProductId);
+        }
+
+        return null;
+    }
     //讀取單筆資料
     public function read_single($ProductId, $auth = null)
     {
