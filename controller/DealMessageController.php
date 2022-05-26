@@ -24,6 +24,15 @@ class DealMessageController
         return $data;
     }
 
+    public function Read_Single($request, $id, $user)
+    {
+        $auth = Authentication::isAuth();
+        if (isset($auth['error'])) return $auth;
+
+        $data = $this->dealmessageservice->read_cancel($id, $user);
+        return $data;
+    }
+
     public function Get_Single($request, $id)
     {
         $auth = Authentication::isAuth();

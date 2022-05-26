@@ -19,8 +19,12 @@ class DealRecordController
     {
         $auth = Authentication::getPayload();
         if (isset($auth['error'])) return $auth;
+        if (isset($auth['CartId'])) {
+            $data = $this->dealservice->read($auth['CartId']);
+        } else {
+            $data = null;
+        }
 
-        $data = $this->dealservice->read($auth['CartId']);
         return $data;
     }
 

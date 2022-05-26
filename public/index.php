@@ -594,6 +594,11 @@ $router->get('/dealm/{id}', function ($request, $controller, $id) {
     return json_encode($result);
 }, $dealmessagecontroller);
 
+$router->get('/readreson/{id}/{user}', function ($request, $controller, $id, $user) {
+    $result = $controller->Read_Single($request, $id, $user);
+    return json_encode($result);
+}, $dealmessagecontroller);
+
 $router->post('/dealm', function ($request, $controller) {
 
     $result = $controller->Post($request);

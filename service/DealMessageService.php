@@ -47,6 +47,41 @@ class DealMessageService
         return $response_arr;
     }
 
+    public function read_cancel($id, $user)
+    {
+        $query = "SELECT dm.*
+                    FROM dealmessage dm,
+                        recorddeal rd
+                    WHERE dm.RecordId = rd.RecordId AND
+                          dm.Creator = '" . $user . "' AND 
+                          dm.RecordId = " . $id;
+        $stmt = $this->conn->prepare($query);
+
+        $result = $stmt->execute();
+
+
+        if ($stmt->rowCount() > 0) {
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            extract($row);
+
+            $data = array(
+                'MessageId' => $MessageId,
+                'RecordId' => $RecordId,
+                'Content' => $Content,
+                'Creator' => $Creator,
+                'CreatedAt' => $CreatedAt,
+                'UpdatedAt' => $UpdatedAt,
+                'DeletedAt' => $DeletedAt
+            );
+
+            $response_arr = $data;
+            return $response_arr;
+        } else {
+            $response_arr['data'] = null;
+            return $response_arr;
+        }
+    }
+
     //讀取單筆資料
     public function read_single($MessageId)
     {

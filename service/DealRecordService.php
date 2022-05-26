@@ -18,7 +18,18 @@ class DealRecordService
     public function read($cartid)
     {
 
-        $query = "SELECT r.* FROM RecordDeal r , ShoppingList s WHERE r.ShoppingId = s.ShoppingId AND CartId = " . $cartid . " ORDER BY r.CreatedAt DESC";
+        $query = "SELECT r.* ,
+                         p.Seller,
+                         sc.Member
+                FROM RecordDeal r ,
+                    shoppinglist s,
+                    product p,
+                    shoppingcart sc
+                WHERE r.ShoppingId = s.ShoppingId AND
+                    s.CartId = sc.CartId AND
+                    p.ProductId = s.ProductId AND
+                    s.CartId = " . $cartid . "	
+                ORDER BY r.CreatedAt DESC";
 
         $stmt  = $this->conn->prepare($query);
 
@@ -32,6 +43,8 @@ class DealRecordService
                 extract($row);
                 $data_item = array(
                     'RecordId' => $RecordId,
+                    'Seller' => $Seller,
+                    'Member' => $Member,
                     'ShoppingId' => $ShoppingId,
                     'State' => $State,
                     'DealMethod' => $DealMethod,
@@ -39,6 +52,8 @@ class DealRecordService
                     'DealType' => $DealType,
                     'StartTime' => $StartTime,
                     'EndTime' => $EndTime,
+                    'Customer_Agree' => $Customer_Agree,
+                    'Seller_Agree' => $Seller_Agree,
                     'CreatedAt' => $CreatedAt,
                     'UpdatedAt' => $UpdatedAt,
                 );
@@ -55,14 +70,17 @@ class DealRecordService
     public function read_seller($auth)
     {
 
-        $query = "SELECT r.*
+        $query = "SELECT r.*,sc.Member
                     FROM RecordDeal r ,
                         shoppinglist s,
                         product p,
-                        users u
+                        users u,
+                        shoppingcart sc
+                        
                     WHERE r.ShoppingId = s.ShoppingId AND
                             p.ProductId = s.ProductId AND
                             p.Seller = u.Account AND
+                            sc.CartId = s.CartId AND
                             u.Account = '" . $auth . "'
                     ORDER BY r.CreatedAt DESC";
 
@@ -78,6 +96,7 @@ class DealRecordService
                 extract($row);
                 $data_item = array(
                     'RecordId' => $RecordId,
+                    'Member' => $Member,
                     'ShoppingId' => $ShoppingId,
                     'State' => $State,
                     'DealMethod' => $DealMethod,
@@ -85,6 +104,8 @@ class DealRecordService
                     'DealType' => $DealType,
                     'StartTime' => $StartTime,
                     'EndTime' => $EndTime,
+                    'Customer_Agree' => $Customer_Agree,
+                    'Seller_Agree' => $Seller_Agree,
                     'CreatedAt' => $CreatedAt,
                     'UpdatedAt' => $UpdatedAt,
                 );
@@ -121,6 +142,8 @@ class DealRecordService
                 'DealType' => $DealType,
                 'StartTime' => $StartTime,
                 'EndTime' => $EndTime,
+                'Customer_Agree' => $Customer_Agree,
+                'Seller_Agree' => $Seller_Agree,
                 'CreatedAt' => $CreatedAt,
                 'UpdatedAt' => $UpdatedAt,
             );
