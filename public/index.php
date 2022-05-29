@@ -549,18 +549,18 @@ $router->delete('/chatroomr/{id}', function ($request, $controller, $id) {
 //---------------------------------------------------------------------------------------------------------------------
 //DealRecord
 
-$router->get('/dealr', function ($request, $controller) {
+$router->get('/dealr/{state}', function ($request, $controller, $state) {
 
-    $result = $controller->Get($request);
+    $result = $controller->Get($request, $state);
     return json_encode($result);
 }, $dealcontroller);
-$router->get('/dealrs', function ($request, $controller) {
+$router->get('/dealrs/{state}', function ($request, $controller, $state) {
 
-    $result = $controller->Get_Seller($request);
+    $result = $controller->Get_Seller($request, $state);
     return json_encode($result);
 }, $dealcontroller);
 
-$router->get('/dealrs/{id}', function ($request, $controller, $id) {
+$router->get('/dealrsingle/{id}', function ($request, $controller, $id) {
 
     $result = $controller->Get_Single($request, $id);
     return json_encode($result);

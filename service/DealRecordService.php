@@ -15,12 +15,32 @@ class DealRecordService
     }
 
     //讀取
-    public function read($cartid)
+    public function read($cartid, $state)
     {
+        switch ($state) {
+            case 's_1':
+                $string = '待處理';
+                break;
+            case 's_2':
+                $string = '運送中';
+                break;
+            case 's_3':
+                $string = '商品確認';
+                break;
+            case 's_4':
+                $string = '取消交易';
+                break;
+            default:
+                $string = '完成交易';
+                break;
+        }
 
         $query = "SELECT r.* ,
                          p.Seller,
-                         sc.Member
+                         sc.Member,
+                         p.Name,
+                         s.Count,
+                         p.Price
                 FROM RecordDeal r ,
                     shoppinglist s,
                     product p,
@@ -28,7 +48,8 @@ class DealRecordService
                 WHERE r.ShoppingId = s.ShoppingId AND
                     s.CartId = sc.CartId AND
                     p.ProductId = s.ProductId AND
-                    s.CartId = " . $cartid . "	
+                    s.CartId = " . $cartid . " AND
+                    r.State = '" .  $string . "'	
                 ORDER BY r.CreatedAt DESC";
 
         $stmt  = $this->conn->prepare($query);
@@ -46,6 +67,9 @@ class DealRecordService
                     'Seller' => $Seller,
                     'Member' => $Member,
                     'ShoppingId' => $ShoppingId,
+                    'Name' => $Name,
+                    'Count' => $Count,
+                    'Price' => $Price,
                     'State' => $State,
                     'DealMethod' => $DealMethod,
                     'SentAddress' => $SentAddress,
@@ -67,10 +91,27 @@ class DealRecordService
     }
 
     //讀取賣家
-    public function read_seller($auth)
+    public function read_seller($auth, $state)
     {
+        switch ($state) {
+            case 's_1':
+                $string = '待處理';
+                break;
+            case 's_2':
+                $string = '運送中';
+                break;
+            case 's_3':
+                $string = '商品確認';
+                break;
+            case 's_4':
+                $string = '取消交易';
+                break;
+            default:
+                $string = '完成交易';
+                break;
+        }
 
-        $query = "SELECT r.*,sc.Member
+        $query = "SELECT r.*,sc.Member,p.Name, s.Count, p.Price
                     FROM RecordDeal r ,
                         shoppinglist s,
                         product p,
@@ -81,7 +122,8 @@ class DealRecordService
                             p.ProductId = s.ProductId AND
                             p.Seller = u.Account AND
                             sc.CartId = s.CartId AND
-                            u.Account = '" . $auth . "'
+                            u.Account = '" . $auth . "' AND
+                            r.State = '" . $string . "'
                     ORDER BY r.CreatedAt DESC";
 
         $stmt  = $this->conn->prepare($query);
@@ -98,6 +140,9 @@ class DealRecordService
                     'RecordId' => $RecordId,
                     'Member' => $Member,
                     'ShoppingId' => $ShoppingId,
+                    'Name' => $Name,
+                    'Count' => $Count,
+                    'Price' => $Price,
                     'State' => $State,
                     'DealMethod' => $DealMethod,
                     'SentAddress' => $SentAddress,
@@ -136,6 +181,7 @@ class DealRecordService
             $data = array(
                 'RecordId' => $RecordId,
                 'ShoppingId' => $ShoppingId,
+                'Name' => $Name,
                 'State' => $State,
                 'DealMethod' => $DealMethod,
                 'SentAddress' => $SentAddress,

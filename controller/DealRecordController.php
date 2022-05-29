@@ -15,12 +15,12 @@ class DealRecordController
         $this->dealservice = new DealRecordService($db);
     }
 
-    public function Get($request)
+    public function Get($request, $state)
     {
         $auth = Authentication::getPayload();
         if (isset($auth['error'])) return $auth;
         if (isset($auth['CartId'])) {
-            $data = $this->dealservice->read($auth['CartId']);
+            $data = $this->dealservice->read($auth['CartId'], $state);
         } else {
             $data = null;
         }
@@ -28,12 +28,12 @@ class DealRecordController
         return $data;
     }
 
-    public function Get_Seller($request)
+    public function Get_Seller($request, $state)
     {
         $auth = Authentication::isAuth();
         if (isset($auth['error'])) return $auth;
 
-        $data = $this->dealservice->read_seller($auth);
+        $data = $this->dealservice->read_seller($auth, $state);
         return $data;
     }
 
