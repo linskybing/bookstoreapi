@@ -94,7 +94,7 @@ class AnnouncementService
         $stmt = $this->conn->prepare($query);
 
         $time = date('Y-m-d H:i:s');
-
+        
         $result = $stmt->execute(array(
             $data['Title'],
             $data['Content'],

@@ -31,7 +31,7 @@ class AnnouncementController
     {
         $auth = Authentication::getPayload();
         if (isset($auth['error'])) return $auth;
-        
+        if (!$auth) return ['error' => '權限不足'];
         if (!Authentication::hasPermission('公告管理', $auth['RoleId'])) return ['error' => '權限不足'];
 
         $data = $request->getBody();
@@ -40,7 +40,7 @@ class AnnouncementController
             'Title' => ['required'],
             'Content' => ['required'],
         ), $data);
-        $data['Admin'] = $auth;
+        $data['Admin'] = $auth['Account'];
         if ($validate != '') {
             return $validate;
         } else {

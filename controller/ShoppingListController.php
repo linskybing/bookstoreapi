@@ -92,7 +92,7 @@ class ShoppingListController
         if (isset($data['ProductId'])) {
             $product = $this->productservice->read_single($data['ProductId']);
             $count = $product['Inventory'];
-            $this->productservice->update($data['ProductId'], array('Inventory' => ($count - 1)));
+            $this->productservice->update($data['ProductId'], array('Inventory' => ($count + 1)));
             $result = $this->listservice->delete($id);
             return $result;
         } else {

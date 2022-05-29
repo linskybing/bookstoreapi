@@ -54,14 +54,14 @@ class ProductController
         return $data;
     }
 
-    public function Get_Seller($request, $state, $search, $nowpage = 1, $itemnum = 10)
+    public function Get_Seller($request, $state)
     {
 
         try {
 
             $auth = Authentication::isAuth();
             if (isset($auth['error'])) return $auth;
-            $data = $this->productservice->read_seller($state, $search, $nowpage, $itemnum, $auth);
+            $data = $this->productservice->read_seller($state, $auth);
             return $data;
         } catch (Exception $e) {
 

@@ -156,11 +156,11 @@ class ProductService
         return $response_arr;
     }
 
-    public function read_seller($state, $search, $nowpage, $itemnum, $auth)
+    public function read_seller($state,  $auth)
     {
 
-        if ($search != 'null') {
-            $query = "SELECT p.ProductId,
+
+        $query = "SELECT p.ProductId,
                             Name,
                             Description,
                             Price,
@@ -177,36 +177,11 @@ class ProductService
                     LEFT JOIN productimage img
                     ON p.ProductId = img.ProductId
                     WHERE p.DeletedAt IS NULL AND
-                        State = '" . $state . "' AND
-                        Name LIKE '%" . $search . "%' AND
+                        State = '" . $state . "' AND                        
                         Seller = '" . $auth . "'
                     GROUP BY ProductId
                     ORDER BY CreatedAt	
-                    LIMIT " . (($nowpage - 1) * $itemnum) . "," . $nowpage * $itemnum . ';';
-        } else {
-            $query = "SELECT p.ProductId,
-                        Name,
-                        Description,
-                        Price,
-                        Inventory,
-                        Image,
-                        State,
-                        Seller,
-                        Watch,
-                        p.CreatedAt,
-                        Rent,
-                        MaxRent,
-                        RentPrice 
-                FROM product p
-                LEFT JOIN productimage img
-                ON p.ProductId = img.ProductId
-                WHERE p.DeletedAt IS NULL AND
-                      State = '" . $state . "' AND
-                      Seller = '" . $auth . "'
-                GROUP BY ProductId
-                ORDER BY CreatedAt	
-                LIMIT " . (($nowpage - 1) * $itemnum) . "," . $nowpage * $itemnum . ';';
-        }
+                    ";
 
         $stmt  = $this->conn->prepare($query);
 
@@ -317,7 +292,8 @@ class ProductService
                         LEFT JOIN productimage img
                         ON p.ProductId = img.ProductId
                         WHERE p.DeletedAt IS NULL AND
-                            State = 'on'
+                            State = 'on' AND 
+                            p.ProductId = " . $ProductId . "
                         GROUP BY ProductId
                         ORDER BY CreatedAt
         ";
