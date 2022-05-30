@@ -16,7 +16,16 @@ class ProblemListService
     //讀取
     public function readbyuser($user, $state)
     {
-        $query = 'SELECT * FROM ' . $this->obj->table . " WHERE PostUser = '" . $user . "' AND State = '" . urldecode($state) . "'AND DeletedAt IS NULL";
+        switch ($state) {
+            case 'p_1':
+                $string = '未解決';
+                break;
+            default:
+                $string = '已解決';
+                break;
+        }
+
+        $query = 'SELECT * FROM ' . $this->obj->table . " WHERE PostUser = '" . $user . "' AND State = '" . $string . "'AND DeletedAt IS NULL";
 
         $stmt  = $this->conn->prepare($query);
 
@@ -48,8 +57,15 @@ class ProblemListService
     //讀取
     public function readbyadmin($state)
     {
-
-        $query = 'SELECT * FROM ' . $this->obj->table . " WHERE State = '" . urldecode($state) . "' AND DeletedAt IS NULL";
+        switch ($state) {
+            case 'p_1':
+                $string = '未解決';
+                break;
+            default:
+                $string = '已解決';
+                break;
+        }
+        $query = 'SELECT * FROM ' . $this->obj->table . " WHERE State = '" . $string . "' AND DeletedAt IS NULL";
 
         $stmt  = $this->conn->prepare($query);
 

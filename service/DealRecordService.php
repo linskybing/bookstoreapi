@@ -22,10 +22,10 @@ class DealRecordService
                 $string = '待處理';
                 break;
             case 's_2':
-                $string = '運送中';
+                $string = '商品確認';
                 break;
             case 's_3':
-                $string = '商品確認';
+                $string = '待評價';
                 break;
             case 's_4':
                 $string = '取消交易';
@@ -98,10 +98,10 @@ class DealRecordService
                 $string = '待處理';
                 break;
             case 's_2':
-                $string = '運送中';
+                $string = '商品確認';
                 break;
             case 's_3':
-                $string = '商品確認';
+                $string = '待評價';
                 break;
             case 's_4':
                 $string = '取消交易';
@@ -110,7 +110,7 @@ class DealRecordService
                 $string = '完成交易';
                 break;
         }
-
+       
         $query = "SELECT r.*,sc.Member,p.Name, s.Count, p.Price
                     FROM RecordDeal r ,
                         shoppinglist s,
@@ -167,7 +167,19 @@ class DealRecordService
     //讀取單筆資料
     public function read_single($RecordId)
     {
-        $query = "SELECT * FROM " . $this->obj->table . " WHERE RecordId = " . $RecordId . " AND DeletedAt IS NULL;";
+        $query = "SELECT r.*,sc.Member,p.Name, s.Count, p.Price
+        FROM RecordDeal r ,
+            shoppinglist s,
+            product p,
+            users u,
+            shoppingcart sc
+            
+        WHERE r.ShoppingId = s.ShoppingId AND
+                p.ProductId = s.ProductId AND
+                p.Seller = u.Account AND
+                sc.CartId = s.CartId AND
+                r.RecordId = " . $RecordId . "
+        ORDER BY r.CreatedAt DESC";
 
         $stmt = $this->conn->prepare($query);
 
@@ -183,13 +195,18 @@ class DealRecordService
                 'ShoppingId' => $ShoppingId,
                 'Name' => $Name,
                 'State' => $State,
+                'Name' => $Name,
+                'Count' => $Count,
+                'Price' => $Price,
                 'DealMethod' => $DealMethod,
                 'SentAddress' => $SentAddress,
                 'DealType' => $DealType,
                 'StartTime' => $StartTime,
                 'EndTime' => $EndTime,
                 'Customer_Agree' => $Customer_Agree,
+                'CustomerContent' => $CustomerContent,
                 'Seller_Agree' => $Seller_Agree,
+                'SellerContent' => $SellerContent,
                 'CreatedAt' => $CreatedAt,
                 'UpdatedAt' => $UpdatedAt,
             );
