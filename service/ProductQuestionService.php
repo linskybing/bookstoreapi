@@ -17,7 +17,20 @@ class ProductQuestionService
     public function read($productid)
     {
 
-        $query = 'SELECT * FROM ' . $this->obj->table . ' WHERE ProductId = ' . $productid . ' AND  DeletedAt IS NULL';
+        $query = "SELECT pq.*,
+                        c.Image AS UserImage,
+                        c.Name AS UserName,
+                        s.Image AS SellerImage,
+                        s.Name AS SellerName 
+                    FROM productquestion pq,
+                        product p,
+                        users s,
+                        users c
+                    WHERE pq.ProductId = " . $productid . " AND
+                        p.ProductId = pq.ProductId AND
+                        p.Seller = s.Account AND
+                        pq.Customer = c.Account
+        ";
 
         $stmt  = $this->conn->prepare($query);
 
@@ -35,9 +48,13 @@ class ProductQuestionService
                     'Content' => $Content,
                     'PostTime' => $PostTime,
                     'Customer' => $Customer,
+                    'UserName' => $UserName,
+                    'UserImage' => $UserImage,
                     'Reply' => $Reply,
                     'ReplyTime' => $ReplyTime,
                     'Seller' => $Seller,
+                    'SellerName' => $SellerName,
+                    'SellerImage' => $SellerImage,
                     'CreatedAt' => $CreatedAt,
                     'UpdatedAt' => $UpdatedAt,
                 );

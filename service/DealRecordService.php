@@ -22,13 +22,19 @@ class DealRecordService
                 $string = '待處理';
                 break;
             case 's_2':
-                $string = '商品確認';
+                $string = '待確認';
                 break;
             case 's_3':
                 $string = '待評價';
                 break;
             case 's_4':
-                $string = '取消交易';
+                $string = '已取消';
+                break;
+            case 's_5':
+                $string = '未歸還';
+                break;
+            case 's_6':
+                $string = '已歸還';
                 break;
             default:
                 $string = '完成交易';
@@ -40,7 +46,8 @@ class DealRecordService
                          sc.Member,
                          p.Name,
                          s.Count,
-                         p.Price
+                         p.Price,
+                         p.RentPrice
                 FROM RecordDeal r ,
                     shoppinglist s,
                     product p,
@@ -70,6 +77,7 @@ class DealRecordService
                     'Name' => $Name,
                     'Count' => $Count,
                     'Price' => $Price,
+                    'RentPrice' => $RentPrice,
                     'State' => $State,
                     'DealMethod' => $DealMethod,
                     'SentAddress' => $SentAddress,
@@ -98,20 +106,26 @@ class DealRecordService
                 $string = '待處理';
                 break;
             case 's_2':
-                $string = '商品確認';
+                $string = '待確認';
                 break;
             case 's_3':
                 $string = '待評價';
                 break;
             case 's_4':
-                $string = '取消交易';
+                $string = '已取消';
+                break;
+            case 's_5':
+                $string = '未歸還';
+                break;
+            case 's_6':
+                $string = '已歸還';
                 break;
             default:
                 $string = '完成交易';
                 break;
         }
-       
-        $query = "SELECT r.*,sc.Member,p.Name, s.Count, p.Price
+
+        $query = "SELECT r.*,sc.Member,p.Name, s.Count, p.Price,p.RentPrice
                     FROM RecordDeal r ,
                         shoppinglist s,
                         product p,
@@ -143,6 +157,7 @@ class DealRecordService
                     'Name' => $Name,
                     'Count' => $Count,
                     'Price' => $Price,
+                    'RentPrice' => $RentPrice,
                     'State' => $State,
                     'DealMethod' => $DealMethod,
                     'SentAddress' => $SentAddress,
@@ -167,7 +182,7 @@ class DealRecordService
     //讀取單筆資料
     public function read_single($RecordId)
     {
-        $query = "SELECT r.*,sc.Member,p.Name, s.Count, p.Price
+        $query = "SELECT r.*,sc.Member,p.Name, s.Count, p.Price,p.RentPrice
         FROM RecordDeal r ,
             shoppinglist s,
             product p,
@@ -198,6 +213,7 @@ class DealRecordService
                 'Name' => $Name,
                 'Count' => $Count,
                 'Price' => $Price,
+                'RentPrice' => $RentPrice,
                 'DealMethod' => $DealMethod,
                 'SentAddress' => $SentAddress,
                 'DealType' => $DealType,
@@ -218,7 +234,50 @@ class DealRecordService
             return $response_arr;
         }
     }
+    //上傳商品
+    public function post_rent($data, $count)
+    {
 
+        date_default_timezone_set('Asia/Taipei');
+
+        $query = "INSERT INTO " . $this->obj->table . "
+                           (ShoppingId, 
+                           State,
+                           DealMethod,  
+                           Phone,
+                           SentAddress,
+                           DealType,
+                           StartTime,
+                           EndTime,                                                                 
+                           CreatedAt,
+                           UpdatedAt) 
+                  VALUES ( ? , ? , ? , ? , ? , ? , ? , ? , ? , ?)";
+
+        $stmt = $this->conn->prepare($query);
+
+        $time = date('Y-m-d H:i:s');
+        $result = $stmt->execute(array(
+            $data['ShoppingId'],
+            $data['State'],
+            $data['DealMethod'],
+            $data['Phone'],
+            $data['SentAddress'],
+            $data['DealType'],
+            date('Y-m-d H:i:s', strtotime($time . '+ ' . $count . 'days')),
+            $time,
+            $time
+        ));
+
+        if ($result) {
+
+            $id = $this->conn->lastInsertId();
+            $response_arr = $this->read_single($id);
+        } else {
+
+            $response_arr['error'] = '資料新增失敗';
+        }
+        return $response_arr;
+    }
     //上傳商品
     public function post($data)
     {

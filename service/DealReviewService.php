@@ -162,6 +162,41 @@ class DealReviewService
         return $response_arr;
     }
 
+    //上傳商品
+    public function post2($data)
+    {
+
+        date_default_timezone_set('Asia/Taipei');
+
+        $query = "INSERT INTO " . $this->obj->table . "
+                           (RecordId, 
+                           SellerScore,
+                           SellerReview,
+                           SellerTime) 
+                  VALUES ( ? , ? , ? , ? )";
+
+        $stmt = $this->conn->prepare($query);
+
+        $time = date('Y-m-d H:i:s');
+
+        $result = $stmt->execute(array(
+            $data['RecordId'],
+            $data['SellerScore'],
+            $data['SellerReview'],
+            $time,
+        ));
+
+        if ($result) {
+
+            $id = $this->conn->lastInsertId();
+            $response_arr = $this->read_single($id);
+        } else {
+
+            $response_arr['error'] = '資料新增失敗';
+        }
+        return $response_arr;
+    }
+
     //更新商品
     public function update($ReviewId, $data)
     {

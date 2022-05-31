@@ -53,7 +53,9 @@ class ShoppingListController
         if ($validate != '') {
             return $validate;
         } else {
+
             $product = $this->productservice->read_single($data['ProductId']);
+            
             $count = $product['Inventory'];
             $this->productservice->update($data['ProductId'], array('Inventory' => ($count - 1)));
             $result = $this->listservice->post($data);
@@ -68,8 +70,8 @@ class ShoppingListController
 
         $data = $request->getBody();
 
-        
-        $list = $this->listservice->read_single($id);        
+
+        $list = $this->listservice->read_single($id);
         if (Authentication::isCreator($list["CartId"], $auth['CartId'])) return ['error' => '權限不足'];
         if (isset($list['ShoppingId'])) {
             $result['info'] = $this->listservice->update($id, $data);

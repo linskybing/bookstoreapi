@@ -83,8 +83,8 @@ class DepositController
         if (isset($auth['error'])) return $auth;
 
         $deposit = $this->depositservice->read_single($id);
-        if (isset($deposit['ProductId'])) {
-            if (Authentication::isCreator($deposit['User'], $auth)) {
+        if (isset($deposit['DepositId'])) {
+            if (!Authentication::isCreator($deposit['User'], $auth)) {
 
                 $data['info'] = $this->depositservice->delete($id);
                 return $data;

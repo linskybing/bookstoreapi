@@ -639,6 +639,12 @@ $router->post('/dealreview', function ($request, $controller) {
     return json_encode($result);
 }, $dealreviewcontroller);
 
+$router->post('/dealreview2', function ($request, $controller) {
+
+    $result = $controller->Post2($request);
+    return json_encode($result);
+}, $dealreviewcontroller);
+
 
 $router->patch('/dealreview/{id}', function ($request, $controller, $id) {
 

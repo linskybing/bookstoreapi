@@ -39,7 +39,7 @@ class ProductQuestionController
 
         $validate = Validator::check(array(
             'ProductId' => ['required'],
-            'Content' => ['required'],            
+            'Content' => ['required'],
         ), $data);
 
         if ($validate != '') {
@@ -59,6 +59,7 @@ class ProductQuestionController
         $data = $request->getBody();
 
         $auth = Authentication::isAuth();
+
         if (isset($auth['error'])) return $auth;
 
         $validate = Validator::check(array(
@@ -71,9 +72,8 @@ class ProductQuestionController
 
         $question = $this->questionservice->read_single($id);
         $product = $this->productservice->read_single($question['ProductId']);
-
         if (isset($product['ProductId'])) {
-            if (Authentication::isCreator($product['Seller'], $auth)) {
+            if (!Authentication::isCreator($product['Seller'], $auth)) {
 
                 $result['info'] = $this->questionservice->update($id, $data);
                 return $result;
