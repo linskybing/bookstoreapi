@@ -182,7 +182,7 @@ class DealRecordService
     //讀取單筆資料
     public function read_single($RecordId)
     {
-        $query = "SELECT r.*,sc.Member,p.Name, s.Count, p.Price,p.RentPrice
+        $query = "SELECT r.*,sc.Member,p.Name, s.Count, p.Price,p.RentPrice,p.Seller,sc.Member,p.ProductId
         FROM RecordDeal r ,
             shoppinglist s,
             product p,
@@ -208,6 +208,8 @@ class DealRecordService
             $data = array(
                 'RecordId' => $RecordId,
                 'ShoppingId' => $ShoppingId,
+                'ProductId' => $ProductId,
+                'Seller' => $Seller,
                 'Name' => $Name,
                 'State' => $State,
                 'Name' => $Name,
@@ -219,6 +221,7 @@ class DealRecordService
                 'DealType' => $DealType,
                 'StartTime' => $StartTime,
                 'EndTime' => $EndTime,
+                'Member' => $Member,
                 'Customer_Agree' => $Customer_Agree,
                 'CustomerContent' => $CustomerContent,
                 'Seller_Agree' => $Seller_Agree,

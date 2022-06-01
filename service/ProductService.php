@@ -249,7 +249,7 @@ class ProductService
 
     public function read_cartid($ProductId)
     {
-        $query = "SELECT ProductId,CartId FROM ShoppingList sl WHERE sl.ProductId =  " . $ProductId . " AND State = '未結帳'";
+        $query = "SELECT ProductId,CartId,sl.Count FROM ShoppingList sl WHERE sl.ProductId =  " . $ProductId . " AND State = '未結帳'";
 
         $stmt  = $this->conn->prepare($query);
 
@@ -260,7 +260,7 @@ class ProductService
         if ($num > 0) {
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
             extract($row);
-            return array('CartId' => $CartId, 'ProductId' => $ProductId);
+            return array('CartId' => $CartId, 'ProductId' => $ProductId, 'Count' => $Count);
         }
 
         return null;

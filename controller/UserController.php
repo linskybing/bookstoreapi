@@ -4,6 +4,7 @@ namespace Controller;
 
 use auth\Jwt;
 use Service\Authentication;
+use Service\CartService;
 use Service\MailService;
 use Service\TokenService;
 use Service\UserService;
@@ -15,11 +16,13 @@ class UserController
     protected $userservice;
     protected $mailservice;
     protected $tokenservice;
+    protected $cartservice;
     public function __construct($db)
     {
         $this->userservice = new UserService($db);
         $this->mailservice = new MailService();
         $this->tokenservice = new TokenService($db);
+        $this->cartservice = new CartService($db);
     }
 
     //會員查詢
@@ -112,6 +115,8 @@ class UserController
             $data['AuthCode'] = $authcode;
 
             $result = $this->userservice->post($data);
+
+            $this->cartservice->read($data['Account']);
 
             $body = $this->mailservice->getmailbody($data['Name'], 'http://localhost:8080/user/' . $data['Account'] . '/' . $data['AuthCode']);
 
